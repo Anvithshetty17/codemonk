@@ -28,7 +28,7 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || 'http://localhost:5173', 'https://codemonk.anvithshetty.me' ,'https://codemonk-tau.vercel.app'
   credentials: true,
   optionsSuccessStatus: 200
 };
