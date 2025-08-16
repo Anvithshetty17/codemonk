@@ -91,6 +91,9 @@ export const AuthProvider = ({ children }) => {
           type: 'LOGIN_SUCCESS',
           payload: { user: response.data.data.user }
         });
+        if (response.data.token) {
+          localStorage.setItem('authToken', response.data.token);
+        }
         return { success: true, message: response.data.message };
       }
     } catch (error) {
