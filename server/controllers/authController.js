@@ -109,6 +109,7 @@ const login = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Login successful',
+    token, // Add token to response for cross-origin support
     data: {
       user: {
         id: user._id,
