@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
+import logo from '../assets/CodeMonk.webp';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,9 +31,10 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container">
         <div className="navbar-content">
-          <Link to="/" className="navbar-brand" onClick={closeMenu}>
-            <span className="brand-text">CODE MONK</span>
-          </Link>
+            <Link to="/" className="navbar-brand" onClick={closeMenu} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <img src={logo} alt="CodeMonk Logo" style={{ height: '71px', width: '45px', objectFit: 'contain' }} />
+              <span className="brand-text">CODE MONK</span>
+            </Link>
 
           <div className={`navbar-menu ${isMenuOpen ? 'is-active' : ''}`}>
             <div className="navbar-nav">
