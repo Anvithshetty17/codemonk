@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import './AnnouncementsList.css';
 
 const AnnouncementsList = () => {
@@ -48,7 +50,7 @@ const AnnouncementsList = () => {
   return (
     <div className="announcements-list">
       <div className="section-header">
-        <h2>📢 Latest Announcements</h2>
+        <h2><FontAwesomeIcon icon={faBullhorn} /> Latest Announcements</h2>
         <p>Stay updated with important news and updates</p>
       </div>
 

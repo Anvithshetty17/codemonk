@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './MembersManager.css';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const MembersManager = () => {
   const [members, setMembers] = useState([]);
@@ -211,14 +213,14 @@ const MembersManager = () => {
                     onClick={() => openModal(member)}
                     title="Edit member"
                   >
-                    ✏️
+                    <FontAwesomeIcon icon={faEdit} />
                   </button>
                   <button 
                     className="btn-icon btn-delete"
                     onClick={() => handleDelete(member._id, member.name)}
                     title="Delete member"
                   >
-                    🗑️
+                    <FontAwesomeIcon icon={faTrash} />
                   </button>
                 </div>
               </div>

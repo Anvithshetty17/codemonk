@@ -1,13 +1,23 @@
 import './Offers.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faBook, 
+  faBriefcase, 
+  faHandshake, 
+  faMicrophone, 
+  faRocket, 
+  faTrophy, 
+  faLaptopCode 
+} from '@fortawesome/free-solid-svg-icons';
 
 const offersData = [
-  { icon: '📚', title: 'Workshop & Training' },
-  { icon: '💼', title: 'Internships' },
-  { icon: '🤝', title: 'Peer Learning' },
-  { icon: '🎤', title: 'Guest Lectures' },
-  { icon: '🚀', title: 'Real Time Projects' },
-  { icon: '🏆', title: 'Coding Contests' },
-  { icon: '💻', title: 'Trending Tech Skills' }
+  { icon: faBook, title: 'Workshop & Training' },
+  { icon: faBriefcase, title: 'Internships' },
+  { icon: faHandshake, title: 'Peer Learning' },
+  { icon: faMicrophone, title: 'Guest Lectures' },
+  { icon: faRocket, title: 'Real Time Projects' },
+  { icon: faTrophy, title: 'Coding Contests' },
+  { icon: faLaptopCode, title: 'Trending Tech Skills' }
 ];
 
 const Offers = () => {
@@ -21,7 +31,9 @@ const Offers = () => {
         <div className="offers-grid">
           {offersData.map((offer, index) => (
             <div key={index} className="offer-item">
-              <div className="offer-icon">{offer.icon}</div>
+              <div className="offer-icon">
+                <FontAwesomeIcon icon={offer.icon} />
+              </div>
               <h3 className="offer-title">{offer.title}</h3>
             </div>
           ))}

@@ -3,6 +3,8 @@ import { useAuth } from '../contexts/AuthContext';
 import AnnouncementsList from '../components/dashboard/AnnouncementsList';
 import MaterialsList from '../components/dashboard/MaterialsList';
 import MyProfile from '../components/dashboard/MyProfile';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBullhorn, faBook, faUser } from '@fortawesome/free-solid-svg-icons';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -22,19 +24,19 @@ const Dashboard = () => {
             className={`nav-btn ${activeSection === 'announcements' ? 'active' : ''}`}
             onClick={() => setActiveSection('announcements')}
           >
-            📢 Announcements
+            <FontAwesomeIcon icon={faBullhorn} /> Announcements
           </button>
           <button
             className={`nav-btn ${activeSection === 'materials' ? 'active' : ''}`}
             onClick={() => setActiveSection('materials')}
           >
-            📚 Study Materials
+            <FontAwesomeIcon icon={faBook} /> Study Materials
           </button>
           <button
             className={`nav-btn ${activeSection === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveSection('profile')}
           >
-            👤 My Profile
+            <FontAwesomeIcon icon={faUser} /> My Profile
           </button>
         </div>
 

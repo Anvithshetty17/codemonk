@@ -10,6 +10,7 @@ import AdminPanel from './pages/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Toast from './components/Toast';
+import './utils/fontawesome'; // Import Font Awesome configuration
 
 function App() {
   return (

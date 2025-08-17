@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import './StudentsTable.css';
 
 const StudentsTable = () => {
@@ -86,7 +88,7 @@ const StudentsTable = () => {
   return (
     <div className="students-table">
       <div className="students-header">
-        <h2>👥 Registered Students</h2>
+        <h2><FontAwesomeIcon icon={faUsers} /> Registered Students</h2>
         <div className="students-filter">
           <label htmlFor="interestFilter">Filter by Interest:</label>
           <select

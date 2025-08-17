@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './AnnouncementsManager.css';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const AnnouncementsManager = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -212,14 +214,14 @@ const AnnouncementsManager = () => {
                       onClick={() => openModal(announcement)}
                       title="Edit announcement"
                     >
-                      ✏️
+                      <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button 
                       className="btn-icon btn-delete"
                       onClick={() => handleDelete(announcement._id, announcement.title)}
                       title="Delete announcement"
                     >
-                      🗑️
+                      <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </div>
                 </div>

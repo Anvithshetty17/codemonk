@@ -1,4 +1,11 @@
 import './Footer.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faFacebook, 
+  faInstagram, 
+  faLinkedin, 
+  faGithub 
+} from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
   return (
@@ -14,16 +21,16 @@ const Footer = () => {
             <h4>Connect With Us</h4>
             <div className="social-links">
               <a href="#" aria-label="Facebook" className="social-link">
-                📘
+                <FontAwesomeIcon icon={faFacebook} />
               </a>
               <a href="#" aria-label="Instagram" className="social-link">
-                📷
+                <FontAwesomeIcon icon={faInstagram} />
               </a>
               <a href="#" aria-label="LinkedIn" className="social-link">
-                💼
+                <FontAwesomeIcon icon={faLinkedin} />
               </a>
               <a href="#" aria-label="GitHub" className="social-link">
-                🐙
+                <FontAwesomeIcon icon={faGithub} />
               </a>
             </div>
           </div>

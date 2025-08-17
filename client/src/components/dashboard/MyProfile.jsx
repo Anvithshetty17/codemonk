@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import api from '../../utils/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faEdit } from '@fortawesome/free-solid-svg-icons';
 import './MyProfile.css';
 
 const MyProfile = () => {
@@ -200,7 +202,7 @@ const MyProfile = () => {
   return (
     <div className="my-profile">
       <div className="profile-header">
-        <h2>👤 My Profile</h2>
+        <h2><FontAwesomeIcon icon={faUser} /> My Profile</h2>
         <p>View and manage your account information</p>
       </div>
 
@@ -214,7 +216,7 @@ const MyProfile = () => {
                 onClick={() => setIsEditing(true)}
                 className="btn btn-outline btn-sm"
               >
-                ✏️ Edit Profile
+                <FontAwesomeIcon icon={faEdit} /> Edit Profile
               </button>
             )}
           </div>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBook } from '@fortawesome/free-solid-svg-icons';
 import './MaterialsList.css';
 
 const MaterialsList = () => {
@@ -46,7 +48,7 @@ const MaterialsList = () => {
   return (
     <div className="materials-list">
       <div className="section-header">
-        <h2>📚 Study Materials</h2>
+        <h2><FontAwesomeIcon icon={faBook} /> Study Materials</h2>
         <p>Access curated learning resources and materials</p>
       </div>
 

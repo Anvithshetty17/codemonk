@@ -3,16 +3,18 @@ import StudentsTable from '../components/admin/StudentsTable';
 import MembersManager from '../components/admin/MembersManager';
 import AnnouncementsManager from '../components/admin/AnnouncementsManager';
 import MaterialsManager from '../components/admin/MaterialsManager';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers, faTrophy, faBullhorn, faBook } from '@fortawesome/free-solid-svg-icons';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState('students');
 
   const sections = [
-    { id: 'students', label: '👥 Students', component: StudentsTable },
-    { id: 'members', label: '🏆 Team Members', component: MembersManager },
-    { id: 'announcements', label: '📢 Announcements', component: AnnouncementsManager },
-    { id: 'materials', label: '📚 Study Materials', component: MaterialsManager }
+    { id: 'students', label: 'Students', icon: faUsers, component: StudentsTable },
+    { id: 'members', label: 'Team Members', icon: faTrophy, component: MembersManager },
+    { id: 'announcements', label: 'Announcements', icon: faBullhorn, component: AnnouncementsManager },
+    { id: 'materials', label: 'Study Materials', icon: faBook, component: MaterialsManager }
   ];
 
   const ActiveComponent = sections.find(section => section.id === activeSection)?.component;
@@ -32,7 +34,7 @@ const AdminPanel = () => {
               className={`admin-nav-btn ${activeSection === section.id ? 'active' : ''}`}
               onClick={() => setActiveSection(section.id)}
             >
-              {section.label}
+              <FontAwesomeIcon icon={section.icon} /> {section.label}
             </button>
           ))}
         </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './MaterialsManager.css';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBook, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const MaterialsManager = () => {
   const [materials, setMaterials] = useState([]);
@@ -244,14 +246,14 @@ const MaterialsManager = () => {
                       onClick={() => openModal(material)}
                       title="Edit material"
                     >
-                      ✏️
+                      <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button 
                       className="btn-icon btn-delete"
                       onClick={() => handleDelete(material._id, material.title)}
                       title="Delete material"
                     >
-                      🗑️
+                      <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </div>
                 </div>
@@ -281,13 +283,13 @@ const MaterialsManager = () => {
                 </div>
 
                 {material.link && (
-                  <a 
+                  <a
                     href={material.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="material-link"
                   >
-                    📚 View Material
+                    <FontAwesomeIcon icon={faBook} /> View Material
                   </a>
                 )}
               </div>
