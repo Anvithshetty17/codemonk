@@ -62,16 +62,29 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is authenticated on app load
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = async (retryCount = 0) => {
       try {
+        console.log('AuthContext - Checking authentication...', retryCount > 0 ? `(retry ${retryCount})` : '');
         const response = await api.get('/auth/me');
+        console.log('AuthContext - Auth check response:', response.data);
         if (response.data.success) {
           dispatch({
             type: 'LOGIN_SUCCESS',
             payload: { user: response.data.data.user }
           });
+          console.log('AuthContext - User authenticated:', response.data.data.user);
         }
       } catch (error) {
+        console.log('AuthContext - Auth check failed:', error.response?.data || error.message);
+        
+        // Retry once if it's a network error and we have a token
+        if (retryCount < 1 && localStorage.getItem('authToken') && 
+            (!error.response || error.response.status >= 500)) {
+          console.log('AuthContext - Retrying auth check...');
+          setTimeout(() => checkAuth(retryCount + 1), 1000);
+          return;
+        }
+        
         dispatch({
           type: 'LOGIN_FAILURE',
           payload: { error: 'Authentication check failed' }
@@ -85,7 +98,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     dispatch({ type: 'LOGIN_START' });
     try {
+      console.log('AuthContext - Attempting login...');
       const response = await api.post('/auth/login', credentials);
+      console.log('AuthContext - Login response:', response.data);
       if (response.data.success) {
         dispatch({
           type: 'LOGIN_SUCCESS',
@@ -93,10 +108,13 @@ export const AuthProvider = ({ children }) => {
         });
         if (response.data.token) {
           localStorage.setItem('authToken', response.data.token);
+          console.log('AuthContext - Token stored in localStorage');
         }
+        console.log('AuthContext - User logged in:', response.data.data.user);
         return { success: true, message: response.data.message };
       }
     } catch (error) {
+      console.log('AuthContext - Login failed:', error.response?.data || error.message);
       const errorMessage = error.response?.data?.message || 'Login failed';
       dispatch({
         type: 'LOGIN_FAILURE',
@@ -141,13 +159,30 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await api.get('/auth/me');
+      if (response.data.success) {
+        dispatch({
+          type: 'UPDATE_USER',
+          payload: { user: response.data.data.user }
+        });
+        return response.data.data.user;
+      }
+    } catch (error) {
+      console.log('AuthContext - Refresh user failed:', error.response?.data || error.message);
+      throw error;
+    }
+  };
+
   const value = {
     ...state,
     login,
     register,
     logout,
     updateUser,
-    clearError
+    clearError,
+    refreshUser
   };
 
   return (

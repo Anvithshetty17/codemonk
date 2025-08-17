@@ -31,9 +31,15 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.log('API Error:', error.response?.status, error.response?.data);
+    
     if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
+      // Clear token from localStorage if it exists
+      localStorage.removeItem('authToken');
+      
+      // Only redirect to login if not already on auth page
       if (window.location.pathname !== '/auth') {
+        console.log('API: Unauthorized, redirecting to auth');
         window.location.href = '/auth';
       }
     }
