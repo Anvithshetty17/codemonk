@@ -35,7 +35,7 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:5173',
       'https://codemonk.anvithshetty.me',
-      'https://codemonk-tau.vercel.app',
+      'https://codemonk-anvith-shettys-projects.vercel.app',
       process.env.CLIENT_URL
     ].filter(Boolean); // Remove any undefined values
     
