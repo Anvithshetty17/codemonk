@@ -130,7 +130,8 @@ const login = asyncHandler(async (req, res) => {
 // @route   GET /api/auth/me
 // @access  Private
 const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  // req.user is already populated by auth middleware
+  const user = req.user;
 
   res.json({
     success: true,
