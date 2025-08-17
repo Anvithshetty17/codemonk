@@ -15,14 +15,16 @@ import {
   faBullhorn,
   faUser,
   faEdit,
-  faTrash
+  faTrash,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons';
 
 import { 
   faFacebook, 
   faInstagram, 
   faLinkedin, 
-  faGithub 
+  faGithub,
+  faTwitter
 } from '@fortawesome/free-brands-svg-icons';
 
 // Add icons to the library
@@ -43,10 +45,12 @@ library.add(
   faUser,
   faEdit,
   faTrash,
+  faGlobe,
   
   // Brand icons
   faFacebook,
   faInstagram,
   faLinkedin,
-  faGithub
+  faGithub,
+  faTwitter
 );
