@@ -1,7 +1,7 @@
 import Hero from '../components/home/Hero';
 import Goals from '../components/home/Goals';
 import Benefits from '../components/home/Benefits';
-import Offers from '../components/home/Offers';
+// import Offers from '../components/home/Offers';      <Offers />
 import Footer from '../components/home/Footer';
 
 const Home = () => {
@@ -10,7 +10,7 @@ const Home = () => {
       <Hero />
       <Goals />
       <Benefits />
-      <Offers />
+      
       <Footer />
     </div>
   );
