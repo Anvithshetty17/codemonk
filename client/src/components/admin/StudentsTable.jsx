@@ -3,7 +3,6 @@ import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
-import './StudentsTable.css';
 
 const StudentsTable = () => {
   const [students, setStudents] = useState([]);

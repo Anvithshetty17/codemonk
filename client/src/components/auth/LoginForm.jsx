@@ -55,9 +55,9 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <div className="form-group">
-        <label htmlFor="email" className="form-label">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
           Email Address *
         </label>
         <input
@@ -66,15 +66,19 @@ const LoginForm = () => {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className={`form-input ${errors.email ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.email 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Enter your email"
           required
         />
-        {errors.email && <div className="error-message">{errors.email}</div>}
+        {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="password" className="form-label">
+      <div>
+        <label htmlFor="password" className="block mb-2 font-medium text-gray-700">
           Password *
         </label>
         <input
@@ -83,30 +87,31 @@ const LoginForm = () => {
           name="password"
           value={formData.password}
           onChange={handleChange}
-          className={`form-input ${errors.password ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.password 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Enter your password"
           required
         />
-        {errors.password && <div className="error-message">{errors.password}</div>}
+        {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="btn btn-primary btn-lg"
-        style={{ width: '100%' }}
+        className="w-full bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center min-h-[52px]"
       >
         {loading ? (
           <>
-            <span className="spinner"></span>
+            <div className="w-5 h-5 border-2 border-transparent border-t-white rounded-full animate-spin mr-2"></div>
             Logging in...
           </>
         ) : (
           'Login'
         )}
       </button>
-
-     
     </form>
   );
 };

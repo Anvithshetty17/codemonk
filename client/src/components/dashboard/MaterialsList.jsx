@@ -3,7 +3,6 @@ import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook } from '@fortawesome/free-solid-svg-icons';
-import './MaterialsList.css';
 
 const MaterialsList = () => {
   const [materials, setMaterials] = useState([]);

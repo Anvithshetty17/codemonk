@@ -5,7 +5,6 @@ import MaterialsList from '../components/dashboard/MaterialsList';
 import MyProfile from '../components/dashboard/MyProfile';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBullhorn, faBook, faUser } from '@fortawesome/free-solid-svg-icons';
-import './Dashboard.css';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('announcements');

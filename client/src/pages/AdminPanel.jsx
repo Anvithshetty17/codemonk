@@ -5,7 +5,6 @@ import AnnouncementsManager from '../components/admin/AnnouncementsManager';
 import MaterialsManager from '../components/admin/MaterialsManager';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faTrophy, faBullhorn, faBook } from '@fortawesome/free-solid-svg-icons';
-import './AdminPanel.css';
 
 const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState('students');

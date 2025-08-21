@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './MembersManager.css';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

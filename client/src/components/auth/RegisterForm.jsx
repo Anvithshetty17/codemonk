@@ -164,9 +164,15 @@ const RegisterForm = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <div className="form-group">
-        <label htmlFor="fullName" className="form-label">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Personal Information Section */}
+      <div className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border-l-4 border-blue-600">
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">Personal Information</h3>
+        <p className="text-gray-600 text-sm mb-0">Let's start with the basics</p>
+      </div>
+
+      <div>
+        <label htmlFor="fullName" className="block mb-2 font-medium text-gray-700">
           Full Name *
         </label>
         <input
@@ -175,15 +181,19 @@ const RegisterForm = ({ onSuccess }) => {
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          className={`form-input ${errors.fullName ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.fullName 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Enter your full name"
           required
         />
-        {errors.fullName && <div className="error-message">{errors.fullName}</div>}
+        {errors.fullName && <div className="text-red-500 text-sm mt-1">{errors.fullName}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="email" className="form-label">
+      <div>
+        <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
           Email Address *
         </label>
         <input
@@ -192,15 +202,19 @@ const RegisterForm = ({ onSuccess }) => {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className={`form-input ${errors.email ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.email 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Enter your email"
           required
         />
-        {errors.email && <div className="error-message">{errors.email}</div>}
+        {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="password" className="form-label">
+      <div>
+        <label htmlFor="password" className="block mb-2 font-medium text-gray-700">
           Password *
         </label>
         <input
@@ -209,15 +223,19 @@ const RegisterForm = ({ onSuccess }) => {
           name="password"
           value={formData.password}
           onChange={handleChange}
-          className={`form-input ${errors.password ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.password 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Create a strong password"
           required
         />
-        {errors.password && <div className="error-message">{errors.password}</div>}
+        {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="confirmPassword" className="form-label">
+      <div>
+        <label htmlFor="confirmPassword" className="block mb-2 font-medium text-gray-700">
           Confirm Password *
         </label>
         <input
@@ -226,15 +244,19 @@ const RegisterForm = ({ onSuccess }) => {
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
-          className={`form-input ${errors.confirmPassword ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.confirmPassword 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Confirm your password"
           required
         />
-        {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
+        {errors.confirmPassword && <div className="text-red-500 text-sm mt-1">{errors.confirmPassword}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="phone" className="form-label">
+      <div>
+        <label htmlFor="phone" className="block mb-2 font-medium text-gray-700">
           Phone Number *
         </label>
         <input
@@ -243,15 +265,19 @@ const RegisterForm = ({ onSuccess }) => {
           name="phone"
           value={formData.phone}
           onChange={handleChange}
-          className={`form-input ${errors.phone ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.phone 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Enter your phone number"
           required
         />
-        {errors.phone && <div className="error-message">{errors.phone}</div>}
+        {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="whatsappNumber" className="form-label">
+      <div>
+        <label htmlFor="whatsappNumber" className="block mb-2 font-medium text-gray-700">
           WhatsApp Number (Optional but Recommended)
         </label>
         <input
@@ -260,14 +286,18 @@ const RegisterForm = ({ onSuccess }) => {
           name="whatsappNumber"
           value={formData.whatsappNumber}
           onChange={handleChange}
-          className={`form-input ${errors.whatsappNumber ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.whatsappNumber 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="Enter your WhatsApp number"
         />
-        {errors.whatsappNumber && <div className="error-message">{errors.whatsappNumber}</div>}
+        {errors.whatsappNumber && <div className="text-red-500 text-sm mt-1">{errors.whatsappNumber}</div>}
       </div>
 
-      <div className="form-group">
-        <label htmlFor="areasOfInterest" className="form-label">
+      <div>
+        <label htmlFor="areasOfInterest" className="block mb-2 font-medium text-gray-700">
           Areas of Interest *
         </label>
         <input
@@ -276,12 +306,16 @@ const RegisterForm = ({ onSuccess }) => {
           name="areasOfInterest"
           value={formData.areasOfInterest}
           onChange={handleChange}
-          className={`form-input ${errors.areasOfInterest ? 'form-error' : ''}`}
+          className={`w-full px-3 py-3 border-2 rounded-lg text-base transition-colors focus:outline-none focus:ring-3 ${
+            errors.areasOfInterest 
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-100' 
+              : 'border-gray-300 focus:border-blue-600 focus:ring-blue-100'
+          }`}
           placeholder="e.g., Web Development, Machine Learning, Mobile Apps"
           required
         />
-        <small className="form-help">Separate multiple interests with commas</small>
-        {errors.areasOfInterest && <div className="error-message">{errors.areasOfInterest}</div>}
+        <small className="text-gray-500 text-xs mt-1 block">Separate multiple interests with commas</small>
+        {errors.areasOfInterest && <div className="text-red-500 text-sm mt-1">{errors.areasOfInterest}</div>}
       </div>
 
       <div className="form-group">

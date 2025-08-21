@@ -4,7 +4,6 @@ import { useToast } from '../../contexts/ToastContext';
 import api from '../../utils/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEdit } from '@fortawesome/free-solid-svg-icons';
-import './MyProfile.css';
 
 const MyProfile = () => {
   const { user, updateUser } = useAuth();

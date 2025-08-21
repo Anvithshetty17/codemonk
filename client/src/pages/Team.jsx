@@ -4,7 +4,6 @@ import { useToast } from '../contexts/ToastContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLinkedin, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
-import './Team.css';
 
 const Team = () => {
   const [members, setMembers] = useState([]);

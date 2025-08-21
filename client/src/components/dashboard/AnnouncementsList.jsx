@@ -3,7 +3,6 @@ import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
-import './AnnouncementsList.css';
 
 const AnnouncementsList = () => {
   const [announcements, setAnnouncements] = useState([]);
