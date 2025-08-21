@@ -79,11 +79,11 @@ const Navbar = () => {
                 </>
               ) : (
                 <Link 
-                  to="/auth" 
+                  to="/login" 
                   className="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
                   onClick={closeMenu}
                 >
-                  Login / Register
+                  Login
                 </Link>
               )}
             </div>

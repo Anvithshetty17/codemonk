@@ -4,7 +4,8 @@ import { ToastProvider } from './contexts/ToastContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Team from './pages/Team';
-import Auth from './pages/Auth';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -23,7 +24,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/team" element={<Team />} />
-                <Route path="/auth" element={<Auth />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <Dashboard />
