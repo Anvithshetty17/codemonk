@@ -199,21 +199,23 @@ const MyProfile = () => {
   };
 
   return (
-    <div className="my-profile">
-      <div className="profile-header">
-        <h2><FontAwesomeIcon icon={faUser} /> My Profile</h2>
-        <p>View and manage your account information</p>
+    <div className="p-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2 mb-2">
+          <FontAwesomeIcon icon={faUser} className="text-blue-600" /> My Profile
+        </h2>
+        <p className="text-gray-600">View and manage your account information</p>
       </div>
 
-      <div className="profile-sections">
+      <div className="space-y-8">
         {/* Profile Information Section */}
-        <div className="profile-section">
-          <div className="section-header">
-            <h3>Profile Information</h3>
+        <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2 sm:mb-0">Profile Information</h3>
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="btn btn-outline btn-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm"
               >
                 <FontAwesomeIcon icon={faEdit} /> Edit Profile
               </button>
@@ -221,92 +223,108 @@ const MyProfile = () => {
           </div>
 
           {isEditing ? (
-            <form onSubmit={handleUpdateProfile} className="profile-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Full Name *</label>
+            <form onSubmit={handleUpdateProfile} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
                   <input
                     type="text"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.fullName ? 'form-error' : ''}`}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                      errors.fullName 
+                        ? 'border-red-500 focus:ring-red-100' 
+                        : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                    }`}
                   />
-                  {errors.fullName && <div className="error-message">{errors.fullName}</div>}
+                  {errors.fullName && <div className="text-red-500 text-xs mt-1">{errors.fullName}</div>}
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Email Address</label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                   <input
                     type="email"
                     value={user?.email || ''}
-                    className="form-input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-100 text-gray-500"
                     disabled
                   />
-                  <small className="form-help">Email cannot be changed</small>
+                  <small className="text-xs text-gray-500 mt-1 block">Email cannot be changed</small>
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Phone Number *</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.phone ? 'form-error' : ''}`}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                      errors.phone 
+                        ? 'border-red-500 focus:ring-red-100' 
+                        : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                    }`}
                   />
-                  {errors.phone && <div className="error-message">{errors.phone}</div>}
+                  {errors.phone && <div className="text-red-500 text-xs mt-1">{errors.phone}</div>}
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">WhatsApp Number</label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
                   <input
                     type="tel"
                     name="whatsappNumber"
                     value={formData.whatsappNumber}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.whatsappNumber ? 'form-error' : ''}`}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                      errors.whatsappNumber 
+                        ? 'border-red-500 focus:ring-red-100' 
+                        : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                    }`}
                   />
-                  {errors.whatsappNumber && <div className="error-message">{errors.whatsappNumber}</div>}
+                  {errors.whatsappNumber && <div className="text-red-500 text-xs mt-1">{errors.whatsappNumber}</div>}
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Areas of Interest *</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Areas of Interest *</label>
                 <input
                   type="text"
                   name="areasOfInterest"
                   value={formData.areasOfInterest}
                   onChange={handleInputChange}
-                  className={`form-input ${errors.areasOfInterest ? 'form-error' : ''}`}
+                  className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                    errors.areasOfInterest 
+                      ? 'border-red-500 focus:ring-red-100' 
+                      : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                  }`}
                   placeholder="Separate multiple interests with commas"
                 />
-                {errors.areasOfInterest && <div className="error-message">{errors.areasOfInterest}</div>}
+                {errors.areasOfInterest && <div className="text-red-500 text-xs mt-1">{errors.areasOfInterest}</div>}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Previous Experience</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Previous Experience</label>
                 <textarea
                   name="previousExperience"
                   value={formData.previousExperience}
                   onChange={handleInputChange}
-                  className="form-textarea"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                   rows="3"
                   placeholder="Tell us about your coding experience..."
                 />
               </div>
 
-              <div className="form-actions">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn btn-primary"
+                  className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? (
                     <>
-                      <span className="spinner"></span>
+                      <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
                       Updating...
                     </>
                   ) : (
@@ -316,66 +334,66 @@ const MyProfile = () => {
                 <button
                   type="button"
                   onClick={cancelEdit}
-                  className="btn btn-secondary"
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   Cancel
                 </button>
               </div>
             </form>
           ) : (
-            <div className="profile-display">
-              <div className="profile-row">
-                <div className="profile-field">
-                  <label>Full Name:</label>
-                  <span>{user?.fullName}</span>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Full Name:</label>
+                  <span className="text-gray-900">{user?.fullName}</span>
                 </div>
-                <div className="profile-field">
-                  <label>Email:</label>
-                  <span>{user?.email}</span>
-                </div>
-              </div>
-
-              <div className="profile-row">
-                <div className="profile-field">
-                  <label>Phone:</label>
-                  <span>{user?.phone}</span>
-                </div>
-                <div className="profile-field">
-                  <label>WhatsApp:</label>
-                  <span>{user?.whatsappNumber || 'Not provided'}</span>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Email:</label>
+                  <span className="text-gray-900">{user?.email}</span>
                 </div>
               </div>
 
-              <div className="profile-field">
-                <label>Areas of Interest:</label>
-                <span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Phone:</label>
+                  <span className="text-gray-900">{user?.phone}</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">WhatsApp:</label>
+                  <span className="text-gray-900">{user?.whatsappNumber || 'Not provided'}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Areas of Interest:</label>
+                <span className="text-gray-900">
                   {Array.isArray(user?.areasOfInterest) 
                     ? user.areasOfInterest.join(', ') 
                     : user?.areasOfInterest || 'Not specified'}
                 </span>
               </div>
 
-              <div className="profile-field">
-                <label>Previous Experience:</label>
-                <span>{user?.previousExperience || 'Not provided'}</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Previous Experience:</label>
+                <span className="text-gray-900">{user?.previousExperience || 'Not provided'}</span>
               </div>
 
-              <div className="profile-field">
-                <label>Member Since:</label>
-                <span>{formatDate(user?.createdAt)}</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Member Since:</label>
+                <span className="text-gray-900">{formatDate(user?.createdAt)}</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Password Change Section */}
-        <div className="profile-section">
-          <div className="section-header">
-            <h3>Change Password</h3>
+        <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2 sm:mb-0">Change Password</h3>
             {!isChangingPassword && (
               <button
                 onClick={() => setIsChangingPassword(true)}
-                className="btn btn-outline btn-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm"
               >
                 🔒 Change Password
               </button>
@@ -383,52 +401,64 @@ const MyProfile = () => {
           </div>
 
           {isChangingPassword ? (
-            <form onSubmit={handleChangePassword} className="password-form">
-              <div className="form-group">
-                <label className="form-label">Current Password *</label>
+            <form onSubmit={handleChangePassword} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Current Password *</label>
                 <input
                   type="password"
                   name="currentPassword"
                   value={passwordData.currentPassword}
                   onChange={handlePasswordChange}
-                  className={`form-input ${errors.currentPassword ? 'form-error' : ''}`}
+                  className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                    errors.currentPassword 
+                      ? 'border-red-500 focus:ring-red-100' 
+                      : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                  }`}
                 />
-                {errors.currentPassword && <div className="error-message">{errors.currentPassword}</div>}
+                {errors.currentPassword && <div className="text-red-500 text-xs mt-1">{errors.currentPassword}</div>}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">New Password *</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">New Password *</label>
                 <input
                   type="password"
                   name="newPassword"
                   value={passwordData.newPassword}
                   onChange={handlePasswordChange}
-                  className={`form-input ${errors.newPassword ? 'form-error' : ''}`}
+                  className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                    errors.newPassword 
+                      ? 'border-red-500 focus:ring-red-100' 
+                      : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                  }`}
                 />
-                {errors.newPassword && <div className="error-message">{errors.newPassword}</div>}
+                {errors.newPassword && <div className="text-red-500 text-xs mt-1">{errors.newPassword}</div>}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Confirm New Password *</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password *</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}
-                  className={`form-input ${errors.confirmPassword ? 'form-error' : ''}`}
+                  className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                    errors.confirmPassword 
+                      ? 'border-red-500 focus:ring-red-100' 
+                      : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                  }`}
                 />
-                {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
+                {errors.confirmPassword && <div className="text-red-500 text-xs mt-1">{errors.confirmPassword}</div>}
               </div>
 
-              <div className="form-actions">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="btn btn-primary"
+                  className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                 >
                   {passwordLoading ? (
                     <>
-                      <span className="spinner"></span>
+                      <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
                       Changing...
                     </>
                   ) : (
@@ -438,14 +468,14 @@ const MyProfile = () => {
                 <button
                   type="button"
                   onClick={cancelPasswordChange}
-                  className="btn btn-secondary"
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   Cancel
                 </button>
               </div>
             </form>
           ) : (
-            <div className="password-display">
+            <div className="text-gray-600">
               <p>Click "Change Password" to update your account password.</p>
             </div>
           )}

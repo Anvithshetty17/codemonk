@@ -19,18 +19,22 @@ const AdminPanel = () => {
   const ActiveComponent = sections.find(section => section.id === activeSection)?.component;
 
   return (
-    <div className="admin-panel">
-      <div className="container">
-        <div className="admin-header">
-          <h1>Admin Panel</h1>
-          <p>Manage Code Monk club content and members</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
+          <p className="text-gray-600">Manage Code Monk club content and members</p>
         </div>
 
-        <div className="admin-nav">
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
           {sections.map((section) => (
             <button
               key={section.id}
-              className={`admin-nav-btn ${activeSection === section.id ? 'active' : ''}`}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+                activeSection === section.id
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+              }`}
               onClick={() => setActiveSection(section.id)}
             >
               <FontAwesomeIcon icon={section.icon} /> {section.label}
@@ -38,7 +42,7 @@ const AdminPanel = () => {
           ))}
         </div>
 
-        <div className="admin-content">
+        <div className="bg-white rounded-lg shadow-sm">
           {ActiveComponent && <ActiveComponent />}
         </div>
       </div>

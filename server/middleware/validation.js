@@ -168,7 +168,6 @@ const materialValidation = [
     .isURL()
     .withMessage('Please enter a valid URL')
 ];
-
 const announcementValidation = [
   body('title')
     .trim()
@@ -179,6 +178,12 @@ const announcementValidation = [
     .trim()
     .isLength({ min: 10, max: 2000 })
     .withMessage('Body must be between 10 and 2000 characters')
+];
+
+const updateRoleValidation = [
+  body('role')
+    .isIn(['student', 'mentor', 'admin'])
+    .withMessage('Role must be one of: student, mentor, admin')
 ];
 
 const handleValidationErrors = (req, res, next) => {
@@ -201,5 +206,6 @@ module.exports = {
   memberValidation,
   materialValidation,
   announcementValidation,
+  updateRoleValidation,
   handleValidationErrors
 };

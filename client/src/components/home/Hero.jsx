@@ -24,7 +24,7 @@ const Hero = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up animation-delay-600">
             <Link 
-              to="/auth" 
+              to="/register" 
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:-translate-y-1 hover:shadow-lg min-w-[200px]"
             >
               Join Our Community

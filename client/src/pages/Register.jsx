@@ -184,7 +184,8 @@ const Register = () => {
         favoriteProgrammingLanguage: formData.favoriteProgrammingLanguage.trim(),
         favoriteLanguageReason: formData.favoriteLanguageReason.trim(),
         proudProject: formData.proudProject.trim(),
-        debuggingProcess: formData.debuggingProcess.trim()
+        debuggingProcess: formData.debuggingProcess.trim(),
+        role: 'student' // Default role for registration
       };
 
       const result = await register(registrationData);

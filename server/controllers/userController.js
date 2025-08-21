@@ -10,8 +10,11 @@ const getUsers = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  // Build filter
-  const filter = { role: 'student' };
+  // Build filter - get all users, not just students
+  const filter = {};
+  if (req.query.role) {
+    filter.role = req.query.role;
+  }
   if (req.query.areasOfInterest) {
     filter.areasOfInterest = { $in: [req.query.areasOfInterest] };
   }
@@ -152,9 +155,61 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Update user role (admin only)
+// @route   PATCH /api/users/:id/role
+// @access  Private/Admin
+const updateUserRole = asyncHandler(async (req, res) => {
+  const { role } = req.body;
+  const userId = req.params.id;
+
+  // Validate role
+  const validRoles = ['student', 'mentor', 'admin'];
+  if (!validRoles.includes(role)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid role. Must be one of: student, mentor, admin'
+    });
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found'
+    });
+  }
+
+  // Prevent changing own role to non-admin
+  if (req.user.id === userId && role !== 'admin') {
+    return res.status(400).json({
+      success: false,
+      message: 'You cannot change your own admin role'
+    });
+  }
+
+  user.role = role;
+  await user.save();
+
+  res.json({
+    success: true,
+    message: `User role updated to ${role} successfully`,
+    data: {
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        updatedAt: user.updatedAt
+      }
+    }
+  });
+});
+
 module.exports = {
   getUsers,
   getMyProfile,
   updateProfile,
-  changePassword
+  changePassword,
+  updateUserRole
 };

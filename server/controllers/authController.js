@@ -51,7 +51,8 @@ const register = asyncHandler(async (req, res) => {
     favoriteProgrammingLanguage,
     favoriteLanguageReason,
     proudProject,
-    debuggingProcess
+    debuggingProcess,
+    role: 'student' // Explicitly set role to student for new registrations
   });
 
   res.status(201).json({

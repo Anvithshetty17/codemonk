@@ -36,8 +36,17 @@ const corsOptions = {
       'http://localhost:5173',
       'https://codemonk.anvithshetty.me',
       'https://codemonk-anvith-shettys-projects.vercel.app',
+      'https://opulent-space-rotary-phone-x55r5xwwg67c675p-5173.app.github.dev',
+      'https://opulent-space-rotary-phone-x55r5xwwg67c675p-5173.app.github.dev/',
       process.env.CLIENT_URL
     ].filter(Boolean); // Remove any undefined values
+    
+    // In development, allow all GitHub Codespaces URLs
+    if (process.env.NODE_ENV !== 'production' && origin) {
+      if (origin.includes('.app.github.dev')) {
+        return callback(null, true);
+      }
+    }
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);

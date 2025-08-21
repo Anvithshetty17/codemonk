@@ -2,23 +2,25 @@ import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { useToast } from '../../contexts/ToastContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faUserGraduate, faUserTie, faUserShield } from '@fortawesome/free-solid-svg-icons';
 
 const StudentsTable = () => {
-  const [students, setStudents] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filterInterest, setFilterInterest] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [filterRole, setFilterRole] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const { showError } = useToast();
+  const [updatingRole, setUpdatingRole] = useState(null);
+  const { showError, showSuccess } = useToast();
 
   useEffect(() => {
-    fetchStudents();
-  }, [currentPage, filterInterest]);
+    fetchUsers();
+  }, [currentPage, filterInterest, filterRole]);
 
-  const fetchStudents = async () => {
+  const fetchUsers = async () => {
     try {
       const params = new URLSearchParams({
         page: currentPage,
@@ -28,21 +30,60 @@ const StudentsTable = () => {
       if (filterInterest) {
         params.append('areasOfInterest', filterInterest);
       }
+      
+      if (filterRole) {
+        params.append('role', filterRole);
+      }
 
-      console.log('Fetching students with params:', params.toString());
+      console.log('Fetching users with params:', params.toString());
       const response = await api.get(`/users?${params}`);
-      console.log('Students API response:', response.data);
+      console.log('Users API response:', response.data);
       
       if (response.data.success) {
-        setStudents(response.data.data.users);
+        setUsers(response.data.data.users);
         setTotalPages(response.data.data.pagination.totalPages);
       }
     } catch (error) {
-      console.error('Error fetching students:', error);
+      console.error('Error fetching users:', error);
       console.error('Error response:', error.response?.data);
-      showError(error.response?.data?.message || 'Failed to load students');
+      showError(error.response?.data?.message || 'Failed to load users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateUserRole = async (userId, newRole) => {
+    try {
+      setUpdatingRole(userId);
+      const response = await api.patch(`/users/${userId}/role`, { role: newRole });
+      
+      if (response.data.success) {
+        showSuccess(`User role updated to ${newRole} successfully`);
+        await fetchUsers(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      showError(error.response?.data?.message || 'Failed to update user role');
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
+  const getRoleIcon = (role) => {
+    switch (role) {
+      case 'admin': return faUserShield;
+      case 'mentor': return faUserTie;
+      case 'student': return faUserGraduate;
+      default: return faUsers;
+    }
+  };
+
+  const getRoleColor = (role) => {
+    switch (role) {
+      case 'admin': return '#dc2626'; // red
+      case 'mentor': return '#2563eb'; // blue
+      case 'student': return '#16a34a'; // green
+      default: return '#6b7280'; // gray
     }
   };
 
@@ -65,13 +106,19 @@ const StudentsTable = () => {
     setLoading(true);
   };
 
-  const openStudentModal = (student) => {
-    setSelectedStudent(student);
+  const handleRoleFilterChange = (e) => {
+    setFilterRole(e.target.value);
+    setCurrentPage(1);
+    setLoading(true);
+  };
+
+  const openUserModal = (user) => {
+    setSelectedUser(user);
     setShowModal(true);
   };
 
-  const closeStudentModal = () => {
-    setSelectedStudent(null);
+  const closeUserModal = () => {
+    setSelectedUser(null);
     setShowModal(false);
   };
 
@@ -79,7 +126,7 @@ const StudentsTable = () => {
     return (
       <div className="students-loading">
         <div className="spinner"></div>
-        <p>Loading students...</p>
+        <p>Loading users...</p>
       </div>
     );
   }
@@ -87,30 +134,46 @@ const StudentsTable = () => {
   return (
     <div className="students-table">
       <div className="students-header">
-        <h2><FontAwesomeIcon icon={faUsers} /> Registered Students</h2>
-        <div className="students-filter">
-          <label htmlFor="interestFilter">Filter by Interest:</label>
-          <select
-            id="interestFilter"
-            value={filterInterest}
-            onChange={handleFilterChange}
-            className="form-select"
-          >
-            <option value="">All Interests</option>
-            <option value="Web Development">Web Development</option>
-            <option value="Machine Learning">Machine Learning</option>
-            <option value="Mobile Development">Mobile Development</option>
-            <option value="Data Science">Data Science</option>
-            <option value="AI">Artificial Intelligence</option>
-            <option value="Cybersecurity">Cybersecurity</option>
-          </select>
+        <h2><FontAwesomeIcon icon={faUsers} /> Registered Users</h2>
+        <div className="students-filters">
+          <div className="students-filter">
+            <label htmlFor="roleFilter">Filter by Role:</label>
+            <select
+              id="roleFilter"
+              value={filterRole}
+              onChange={handleRoleFilterChange}
+              className="form-select"
+            >
+              <option value="">All Roles</option>
+              <option value="student">Students</option>
+              <option value="mentor">Mentors</option>
+              <option value="admin">Admins</option>
+            </select>
+          </div>
+          <div className="students-filter">
+            <label htmlFor="interestFilter">Filter by Interest:</label>
+            <select
+              id="interestFilter"
+              value={filterInterest}
+              onChange={handleFilterChange}
+              className="form-select"
+            >
+              <option value="">All Interests</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Machine Learning">Machine Learning</option>
+              <option value="Mobile Development">Mobile Development</option>
+              <option value="Data Science">Data Science</option>
+              <option value="AI">Artificial Intelligence</option>
+              <option value="Cybersecurity">Cybersecurity</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {students.length === 0 ? (
+      {users.length === 0 ? (
         <div className="no-students">
-          <h3>No Students Found</h3>
-          <p>No students match the current filter criteria.</p>
+          <h3>No Users Found</h3>
+          <p>No users match the current filter criteria.</p>
         </div>
       ) : (
         <>
@@ -120,36 +183,63 @@ const StudentsTable = () => {
                 <tr>
                   <th>Full Name</th>
                   <th>Email</th>
+                  <th>Role</th>
                   <th>Phone</th>
-                  <th>WhatsApp</th>
                   <th>Areas of Interest</th>
                   <th>Joined</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {students.map((student) => (
-                  <tr key={student._id}>
-                    <td>{student.fullName}</td>
-                    <td>{student.email}</td>
-                    <td>{student.phone}</td>
-                    <td>{student.whatsappNumber || 'N/A'}</td>
+                {users.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.fullName}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <div className="role-container">
+                        <span 
+                          className="role-badge" 
+                          style={{ 
+                            backgroundColor: getRoleColor(user.role),
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '0.8rem',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          <FontAwesomeIcon icon={getRoleIcon(user.role)} /> {user.role}
+                        </span>
+                        <select
+                          value={user.role}
+                          onChange={(e) => updateUserRole(user._id, e.target.value)}
+                          disabled={updatingRole === user._id}
+                          className="role-select"
+                          style={{ marginLeft: '8px', fontSize: '0.8rem' }}
+                        >
+                          <option value="student">Student</option>
+                          <option value="mentor">Mentor</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td>{user.phone}</td>
                     <td>
                       <div className="interests-tags">
-                        {Array.isArray(student.areasOfInterest) 
-                          ? student.areasOfInterest.map((interest, index) => (
+                        {Array.isArray(user.areasOfInterest) 
+                          ? user.areasOfInterest.map((interest, index) => (
                               <span key={index} className="interest-tag">
                                 {interest}
                               </span>
                             ))
-                          : student.areasOfInterest
+                          : user.areasOfInterest
                         }
                       </div>
                     </td>
-                    <td>{formatDate(student.createdAt)}</td>
+                    <td>{formatDate(user.createdAt)}</td>
                     <td>
                       <button
-                        onClick={() => openStudentModal(student)}
+                        onClick={() => openUserModal(user)}
                         className="btn btn-secondary btn-sm"
                         title="View detailed information"
                       >
@@ -188,15 +278,15 @@ const StudentsTable = () => {
         </>
       )}
 
-      {/* Student Details Modal */}
-      {showModal && selectedStudent && (
-        <div className="modal-overlay" onClick={closeStudentModal}>
+      {/* User Details Modal */}
+      {showModal && selectedUser && (
+        <div className="modal-overlay" onClick={closeUserModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Student Details</h3>
+              <h3>User Details</h3>
               <button 
                 className="modal-close"
-                onClick={closeStudentModal}
+                onClick={closeUserModal}
                 aria-label="Close modal"
               >
                 ×
@@ -210,23 +300,39 @@ const StudentsTable = () => {
                   <div className="detail-grid">
                     <div className="detail-item">
                       <label>Full Name:</label>
-                      <span>{selectedStudent.fullName}</span>
+                      <span>{selectedUser.fullName}</span>
                     </div>
                     <div className="detail-item">
                       <label>Email:</label>
-                      <span>{selectedStudent.email}</span>
+                      <span>{selectedUser.email}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Role:</label>
+                      <span 
+                        className="role-badge" 
+                        style={{ 
+                          backgroundColor: getRoleColor(selectedUser.role),
+                          color: 'white',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        <FontAwesomeIcon icon={getRoleIcon(selectedUser.role)} /> {selectedUser.role}
+                      </span>
                     </div>
                     <div className="detail-item">
                       <label>Phone:</label>
-                      <span>{selectedStudent.phone}</span>
+                      <span>{selectedUser.phone}</span>
                     </div>
                     <div className="detail-item">
                       <label>WhatsApp:</label>
-                      <span>{selectedStudent.whatsappNumber || 'Not provided'}</span>
+                      <span>{selectedUser.whatsappNumber || 'Not provided'}</span>
                     </div>
                     <div className="detail-item">
                       <label>Joined:</label>
-                      <span>{formatDate(selectedStudent.createdAt)}</span>
+                      <span>{formatDate(selectedUser.createdAt)}</span>
                     </div>
                   </div>
                 </div>
@@ -236,11 +342,11 @@ const StudentsTable = () => {
                   <div className="detail-grid">
                     <div className="detail-item">
                       <label>Coding Skills Rating:</label>
-                      <span>{selectedStudent.codingSkillsRating || 'Not provided'}/10</span>
+                      <span>{selectedUser.codingSkillsRating || 'Not provided'}/10</span>
                     </div>
                     <div className="detail-item">
                       <label>Favorite Programming Language:</label>
-                      <span>{selectedStudent.favoriteProgrammingLanguage || 'Not provided'}</span>
+                      <span>{selectedUser.favoriteProgrammingLanguage || 'Not provided'}</span>
                     </div>
                   </div>
                 </div>
@@ -248,42 +354,42 @@ const StudentsTable = () => {
                 <div className="detail-section">
                   <h4>Areas of Interest</h4>
                   <div className="interests-tags">
-                    {Array.isArray(selectedStudent.areasOfInterest) 
-                      ? selectedStudent.areasOfInterest.map((interest, index) => (
+                    {Array.isArray(selectedUser.areasOfInterest) 
+                      ? selectedUser.areasOfInterest.map((interest, index) => (
                           <span key={index} className="interest-tag">
                             {interest}
                           </span>
                         ))
-                      : <span>{selectedStudent.areasOfInterest || 'Not provided'}</span>
+                      : <span>{selectedUser.areasOfInterest || 'Not provided'}</span>
                     }
                   </div>
                 </div>
 
-                {selectedStudent.favoriteLanguageReason && (
+                {selectedUser.favoriteLanguageReason && (
                   <div className="detail-section">
                     <h4>Why Their Favorite Language?</h4>
-                    <p className="detail-text">{selectedStudent.favoriteLanguageReason}</p>
+                    <p className="detail-text">{selectedUser.favoriteLanguageReason}</p>
                   </div>
                 )}
 
-                {selectedStudent.proudProject && (
+                {selectedUser.proudProject && (
                   <div className="detail-section">
                     <h4>Project They're Proud Of</h4>
-                    <p className="detail-text">{selectedStudent.proudProject}</p>
+                    <p className="detail-text">{selectedUser.proudProject}</p>
                   </div>
                 )}
 
-                {selectedStudent.debuggingProcess && (
+                {selectedUser.debuggingProcess && (
                   <div className="detail-section">
                     <h4>Debugging Approach</h4>
-                    <p className="detail-text">{selectedStudent.debuggingProcess}</p>
+                    <p className="detail-text">{selectedUser.debuggingProcess}</p>
                   </div>
                 )}
 
-                {selectedStudent.previousExperience && (
+                {selectedUser.previousExperience && (
                   <div className="detail-section">
                     <h4>Previous Experience</h4>
-                    <p className="detail-text">{selectedStudent.previousExperience}</p>
+                    <p className="detail-text">{selectedUser.previousExperience}</p>
                   </div>
                 )}
               </div>
