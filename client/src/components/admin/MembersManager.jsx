@@ -155,21 +155,21 @@ const MembersManager = () => {
 
   if (loading) {
     return (
-      <div className="members-manager">
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Loading team members...</p>
+      <div className="p-6">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading team members...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="members-manager">
-      <div className="members-header">
-        <h2>Team Members ({members.length})</h2>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Team Members ({members.length})</h2>
         <button 
-          className="btn btn-primary"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
           onClick={() => openModal()}
         >
           Add New Member
@@ -177,137 +177,138 @@ const MembersManager = () => {
       </div>
 
       {members.length === 0 ? (
-        <div className="empty-state">
-          <h3>No team members yet</h3>
-          <p>Add your first team member to get started.</p>
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">No team members yet</h3>
+          <p className="text-gray-500 mb-6">Add your first team member to get started.</p>
           <button 
-            className="btn btn-primary"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
             onClick={() => openModal()}
           >
             Add First Member
           </button>
         </div>
       ) : (
-        <div className="members-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {members.map(member => (
-            <div key={member._id} className="member-card">
+            <div key={member._id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
               {member.image && (
-                <div className="member-image">
+                <div className="h-48 overflow-hidden">
                   <img 
                     src={member.image} 
                     alt={member.name}
+                    className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.style.display = 'none';
                     }}
                   />
                 </div>
               )}
-              <div className="member-header">
-                <div className="member-info">
-                  <h3>{member.name}</h3>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">{member.name}</h3>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200"
+                      onClick={() => openModal(member)}
+                      title="Edit member"
+                    >
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button 
+                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-200"
+                      onClick={() => handleDelete(member._id, member.name)}
+                      title="Delete member"
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </div>
                 </div>
-                <div className="member-actions">
-                  <button 
-                    className="btn-icon btn-edit"
-                    onClick={() => openModal(member)}
-                    title="Edit member"
-                  >
-                    <FontAwesomeIcon icon={faEdit} />
-                  </button>
-                  <button 
-                    className="btn-icon btn-delete"
-                    onClick={() => handleDelete(member._id, member.name)}
-                    title="Delete member"
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                </div>
+                
+                {member.description && (
+                  <p className="text-gray-600 mb-4">{member.description}</p>
+                )}
+                
+                {member.socialLinks && Object.keys(member.socialLinks).length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {member.socialLinks.linkedin && (
+                      <a 
+                        href={member.socialLinks.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        🔗 LinkedIn
+                      </a>
+                    )}
+                    {member.socialLinks.github && (
+                      <a 
+                        href={member.socialLinks.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        🔗 GitHub
+                      </a>
+                    )}
+                    {member.socialLinks.twitter && (
+                      <a 
+                        href={member.socialLinks.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        🔗 Twitter
+                      </a>
+                    )}
+                    {member.socialLinks.portfolio && (
+                      <a 
+                        href={member.socialLinks.portfolio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        🔗 Portfolio
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
-              
-              {member.description && (
-                <p className="member-description">{member.description}</p>
-              )}
-              
-              {member.socialLinks && Object.keys(member.socialLinks).length > 0 && (
-                <div className="member-links">
-                  {member.socialLinks.linkedin && (
-                    <a 
-                      href={member.socialLinks.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="member-link"
-                    >
-                      🔗 LinkedIn
-                    </a>
-                  )}
-                  {member.socialLinks.github && (
-                    <a 
-                      href={member.socialLinks.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="member-link"
-                    >
-                      🔗 GitHub
-                    </a>
-                  )}
-                  {member.socialLinks.twitter && (
-                    <a 
-                      href={member.socialLinks.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="member-link"
-                    >
-                      🔗 Twitter
-                    </a>
-                  )}
-                  {member.socialLinks.portfolio && (
-                    <a 
-                      href={member.socialLinks.portfolio}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="member-link"
-                    >
-                      🔗 Portfolio
-                    </a>
-                  )}
-                </div>
-              )}
             </div>
           ))}
         </div>
       )}
 
       {showModal && (
-        <div className="member-modal" onClick={closeModal}>
-          <div className="member-modal-content" onClick={e => e.stopPropagation()}>
-            <div className="member-modal-header">
-              <h3>{editingMember ? 'Edit Team Member' : 'Add New Team Member'}</h3>
-              <button className="modal-close" onClick={closeModal}>×</button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeModal}>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-800">{editingMember ? 'Edit Team Member' : 'Add New Team Member'}</h3>
+              <button className="text-gray-500 hover:text-gray-700 text-2xl" onClick={closeModal}>×</button>
             </div>
             
-            <form className="member-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div>
-                  <label htmlFor="name" className="form-label">Name *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="form-input"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
+            <form className="p-6 space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
 
               <div>
-                <label htmlFor="email" className="form-label">Email</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  className="form-input"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="member@example.com"
@@ -315,12 +316,12 @@ const MembersManager = () => {
               </div>
 
               <div>
-                <label htmlFor="image" className="form-label">Profile Image URL</label>
+                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">Profile Image URL</label>
                 <input
                   type="url"
                   id="image"
                   name="image"
-                  className="form-input"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={formData.image}
                   onChange={handleInputChange}
                   placeholder="https://example.com/profile-image.jpg"
@@ -328,11 +329,11 @@ const MembersManager = () => {
               </div>
 
               <div>
-                <label htmlFor="description" className="form-label">Description</label>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   id="description"
                   name="description"
-                  className="form-textarea"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="3"
@@ -340,66 +341,68 @@ const MembersManager = () => {
                 />
               </div>
 
-              <div className="social-links-section">
-                <h4>Social Links</h4>
+              <div className="border-t pt-4">
+                <h4 className="text-lg font-medium text-gray-800 mb-4">Social Links</h4>
                 
-                <div className="social-link-input">
-                  <label htmlFor="linkedin">LinkedIn:</label>
-                  <input
-                    type="url"
-                    id="linkedin"
-                    name="linkedin"
-                    className="form-input"
-                    value={formData.linkedin}
-                    onChange={handleInputChange}
-                    placeholder="https://linkedin.com/in/username"
-                  />
-                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">LinkedIn:</label>
+                    <input
+                      type="url"
+                      id="linkedin"
+                      name="linkedin"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={formData.linkedin}
+                      onChange={handleInputChange}
+                      placeholder="https://linkedin.com/in/username"
+                    />
+                  </div>
 
-                <div className="social-link-input">
-                  <label htmlFor="github">GitHub:</label>
-                  <input
-                    type="url"
-                    id="github"
-                    name="github"
-                    className="form-input"
-                    value={formData.github}
-                    onChange={handleInputChange}
-                    placeholder="https://github.com/username"
-                  />
-                </div>
+                  <div>
+                    <label htmlFor="github" className="block text-sm font-medium text-gray-700 mb-1">GitHub:</label>
+                    <input
+                      type="url"
+                      id="github"
+                      name="github"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={formData.github}
+                      onChange={handleInputChange}
+                      placeholder="https://github.com/username"
+                    />
+                  </div>
 
-                <div className="social-link-input">
-                  <label htmlFor="twitter">Twitter:</label>
-                  <input
-                    type="url"
-                    id="twitter"
-                    name="twitter"
-                    className="form-input"
-                    value={formData.twitter}
-                    onChange={handleInputChange}
-                    placeholder="https://twitter.com/username"
-                  />
-                </div>
+                  <div>
+                    <label htmlFor="twitter" className="block text-sm font-medium text-gray-700 mb-1">Twitter:</label>
+                    <input
+                      type="url"
+                      id="twitter"
+                      name="twitter"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={formData.twitter}
+                      onChange={handleInputChange}
+                      placeholder="https://twitter.com/username"
+                    />
+                  </div>
 
-                <div className="social-link-input">
-                  <label htmlFor="portfolio">Portfolio:</label>
-                  <input
-                    type="url"
-                    id="portfolio"
-                    name="portfolio"
-                    className="form-input"
-                    value={formData.portfolio}
-                    onChange={handleInputChange}
-                    placeholder="https://portfolio.com"
-                  />
+                  <div>
+                    <label htmlFor="portfolio" className="block text-sm font-medium text-gray-700 mb-1">Portfolio:</label>
+                    <input
+                      type="url"
+                      id="portfolio"
+                      name="portfolio"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={formData.portfolio}
+                      onChange={handleInputChange}
+                      placeholder="https://portfolio.com"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="form-actions">
+              <div className="flex justify-end gap-3 pt-4">
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200"
                   onClick={closeModal}
                   disabled={submitting}
                 >
@@ -407,7 +410,7 @@ const MembersManager = () => {
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50"
                   disabled={submitting}
                 >
                   {submitting ? 'Saving...' : (editingMember ? 'Update Member' : 'Add Member')}

@@ -4,6 +4,8 @@ import { ToastProvider } from './contexts/ToastContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Team from './pages/Team';
+import Teams from './pages/Teams';
+import Tasks from './pages/Tasks';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -24,6 +26,16 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/team" element={<Team />} />
+                <Route path="/teams" element={
+                  <ProtectedRoute>
+                    <Teams />
+                  </ProtectedRoute>
+                } />
+                <Route path="/tasks" element={
+                  <ProtectedRoute>
+                    <Tasks />
+                  </ProtectedRoute>
+                } />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={

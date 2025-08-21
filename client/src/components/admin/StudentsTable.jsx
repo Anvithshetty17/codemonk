@@ -124,25 +124,29 @@ const StudentsTable = () => {
 
   if (loading) {
     return (
-      <div className="students-loading">
-        <div className="spinner"></div>
-        <p>Loading users...</p>
+      <div className="p-6">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading users...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="students-table">
-      <div className="students-header">
-        <h2><FontAwesomeIcon icon={faUsers} /> Registered Users</h2>
-        <div className="students-filters">
-          <div className="students-filter">
-            <label htmlFor="roleFilter">Filter by Role:</label>
+    <div className="p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <FontAwesomeIcon icon={faUsers} /> Registered Users
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <div className="flex flex-col">
+            <label htmlFor="roleFilter" className="text-sm font-medium text-gray-700 mb-1">Filter by Role:</label>
             <select
               id="roleFilter"
               value={filterRole}
               onChange={handleRoleFilterChange}
-              className="form-select"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">All Roles</option>
               <option value="student">Students</option>
@@ -150,13 +154,13 @@ const StudentsTable = () => {
               <option value="admin">Admins</option>
             </select>
           </div>
-          <div className="students-filter">
-            <label htmlFor="interestFilter">Filter by Interest:</label>
+          <div className="flex flex-col">
+            <label htmlFor="interestFilter" className="text-sm font-medium text-gray-700 mb-1">Filter by Interest:</label>
             <select
               id="interestFilter"
               value={filterInterest}
               onChange={handleFilterChange}
-              className="form-select"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">All Interests</option>
               <option value="Web Development">Web Development</option>
@@ -171,41 +175,37 @@ const StudentsTable = () => {
       </div>
 
       {users.length === 0 ? (
-        <div className="no-students">
-          <h3>No Users Found</h3>
-          <p>No users match the current filter criteria.</p>
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Users Found</h3>
+          <p className="text-gray-500">No users match the current filter criteria.</p>
         </div>
       ) : (
         <>
-          <div className="table-container">
-            <table className="students-data-table">
-              <thead>
+          <div className="overflow-x-auto bg-white rounded-lg shadow">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Phone</th>
-                  <th>Areas of Interest</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Areas of Interest</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <div className="role-container">
+                  <tr key={user._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.fullName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col gap-2">
                         <span 
-                          className="role-badge" 
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
                           style={{ 
                             backgroundColor: getRoleColor(user.role),
-                            color: 'white',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '0.8rem',
-                            fontWeight: 'bold'
+                            color: 'white'
                           }}
                         >
                           <FontAwesomeIcon icon={getRoleIcon(user.role)} /> {user.role}
@@ -214,8 +214,7 @@ const StudentsTable = () => {
                           value={user.role}
                           onChange={(e) => updateUserRole(user._id, e.target.value)}
                           disabled={updatingRole === user._id}
-                          className="role-select"
-                          style={{ marginLeft: '8px', fontSize: '0.8rem' }}
+                          className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
                           <option value="student">Student</option>
                           <option value="mentor">Mentor</option>
@@ -223,24 +222,24 @@ const StudentsTable = () => {
                         </select>
                       </div>
                     </td>
-                    <td>{user.phone}</td>
-                    <td>
-                      <div className="interests-tags">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phone}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
                         {Array.isArray(user.areasOfInterest) 
                           ? user.areasOfInterest.map((interest, index) => (
-                              <span key={index} className="interest-tag">
+                              <span key={index} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                                 {interest}
                               </span>
                             ))
-                          : user.areasOfInterest
+                          : <span className="text-sm text-gray-500">{user.areasOfInterest}</span>
                         }
                       </div>
                     </td>
-                    <td>{formatDate(user.createdAt)}</td>
-                    <td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() => openUserModal(user)}
-                        className="btn btn-secondary btn-sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
                         title="View detailed information"
                       >
                         View Details
@@ -253,23 +252,23 @@ const StudentsTable = () => {
           </div>
 
           {totalPages > 1 && (
-            <div className="pagination">
+            <div className="flex justify-center items-center gap-4 mt-6">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="btn btn-secondary btn-sm"
+                className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               
-              <span className="pagination-info">
+              <span className="text-sm text-gray-600">
                 Page {currentPage} of {totalPages}
               </span>
               
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="btn btn-secondary btn-sm"
+                className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -280,12 +279,12 @@ const StudentsTable = () => {
 
       {/* User Details Modal */}
       {showModal && selectedUser && (
-        <div className="modal-overlay" onClick={closeUserModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>User Details</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeUserModal}>
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-800">User Details</h3>
               <button 
-                className="modal-close"
+                className="text-gray-500 hover:text-gray-700 text-2xl"
                 onClick={closeUserModal}
                 aria-label="Close modal"
               >
@@ -293,103 +292,99 @@ const StudentsTable = () => {
               </button>
             </div>
             
-            <div className="modal-body">
-              <div className="student-details">
-                <div className="detail-section">
-                  <h4>Basic Information</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Full Name:</label>
-                      <span>{selectedUser.fullName}</span>
+            <div className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Full Name:</label>
+                      <span className="text-gray-900">{selectedUser.fullName}</span>
                     </div>
-                    <div className="detail-item">
-                      <label>Email:</label>
-                      <span>{selectedUser.email}</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Email:</label>
+                      <span className="text-gray-900">{selectedUser.email}</span>
                     </div>
-                    <div className="detail-item">
-                      <label>Role:</label>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Role:</label>
                       <span 
-                        className="role-badge" 
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
                         style={{ 
                           backgroundColor: getRoleColor(selectedUser.role),
-                          color: 'white',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '0.8rem',
-                          fontWeight: 'bold'
+                          color: 'white'
                         }}
                       >
                         <FontAwesomeIcon icon={getRoleIcon(selectedUser.role)} /> {selectedUser.role}
                       </span>
                     </div>
-                    <div className="detail-item">
-                      <label>Phone:</label>
-                      <span>{selectedUser.phone}</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Phone:</label>
+                      <span className="text-gray-900">{selectedUser.phone}</span>
                     </div>
-                    <div className="detail-item">
-                      <label>WhatsApp:</label>
-                      <span>{selectedUser.whatsappNumber || 'Not provided'}</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">WhatsApp:</label>
+                      <span className="text-gray-900">{selectedUser.whatsappNumber || 'Not provided'}</span>
                     </div>
-                    <div className="detail-item">
-                      <label>Joined:</label>
-                      <span>{formatDate(selectedUser.createdAt)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="detail-section">
-                  <h4>Coding Profile</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Coding Skills Rating:</label>
-                      <span>{selectedUser.codingSkillsRating || 'Not provided'}/10</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Favorite Programming Language:</label>
-                      <span>{selectedUser.favoriteProgrammingLanguage || 'Not provided'}</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Joined:</label>
+                      <span className="text-gray-900">{formatDate(selectedUser.createdAt)}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="detail-section">
-                  <h4>Areas of Interest</h4>
-                  <div className="interests-tags">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Coding Profile</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Coding Skills Rating:</label>
+                      <span className="text-gray-900">{selectedUser.codingSkillsRating || 'Not provided'}/10</span>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Favorite Programming Language:</label>
+                      <span className="text-gray-900">{selectedUser.favoriteProgrammingLanguage || 'Not provided'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Areas of Interest</h4>
+                  <div className="flex flex-wrap gap-2">
                     {Array.isArray(selectedUser.areasOfInterest) 
                       ? selectedUser.areasOfInterest.map((interest, index) => (
-                          <span key={index} className="interest-tag">
+                          <span key={index} className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
                             {interest}
                           </span>
                         ))
-                      : <span>{selectedUser.areasOfInterest || 'Not provided'}</span>
+                      : <span className="text-gray-900">{selectedUser.areasOfInterest || 'Not provided'}</span>
                     }
                   </div>
                 </div>
 
                 {selectedUser.favoriteLanguageReason && (
-                  <div className="detail-section">
-                    <h4>Why Their Favorite Language?</h4>
-                    <p className="detail-text">{selectedUser.favoriteLanguageReason}</p>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Why Their Favorite Language?</h4>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{selectedUser.favoriteLanguageReason}</p>
                   </div>
                 )}
 
                 {selectedUser.proudProject && (
-                  <div className="detail-section">
-                    <h4>Project They're Proud Of</h4>
-                    <p className="detail-text">{selectedUser.proudProject}</p>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Project They're Proud Of</h4>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{selectedUser.proudProject}</p>
                   </div>
                 )}
 
                 {selectedUser.debuggingProcess && (
-                  <div className="detail-section">
-                    <h4>Debugging Approach</h4>
-                    <p className="detail-text">{selectedUser.debuggingProcess}</p>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Debugging Approach</h4>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{selectedUser.debuggingProcess}</p>
                   </div>
                 )}
 
                 {selectedUser.previousExperience && (
-                  <div className="detail-section">
-                    <h4>Previous Experience</h4>
-                    <p className="detail-text">{selectedUser.previousExperience}</p>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Previous Experience</h4>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{selectedUser.previousExperience}</p>
                   </div>
                 )}
               </div>

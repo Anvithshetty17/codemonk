@@ -61,6 +61,20 @@ const Navbar = () => {
                   >
                     Dashboard
                   </Link>
+                  <Link 
+                    to="/teams" 
+                    className={`py-4 md:py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors border-b border-gray-200 md:border-b-0 relative ${isActiveLink('/teams') ? 'text-blue-600 md:after:absolute md:after:bottom-[-0.5rem] md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-blue-600 md:after:rounded' : ''}`}
+                    onClick={closeMenu}
+                  >
+                    Teams
+                  </Link>
+                  <Link 
+                    to="/tasks" 
+                    className={`py-4 md:py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors border-b border-gray-200 md:border-b-0 relative ${isActiveLink('/tasks') ? 'text-blue-600 md:after:absolute md:after:bottom-[-0.5rem] md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-blue-600 md:after:rounded' : ''}`}
+                    onClick={closeMenu}
+                  >
+                    Tasks
+                  </Link>
                   {user?.role === 'admin' && (
                     <Link 
                       to="/admin" 

@@ -170,22 +170,22 @@ const MaterialsManager = () => {
 
   if (loading) {
     return (
-      <div className="materials-manager">
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Loading study materials...</p>
+      <div className="p-6">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading study materials...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="materials-manager">
-      <div className="materials-header">
-        <h2>Study Materials ({filteredMaterials.length})</h2>
-        <div className="materials-filters">
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Study Materials ({filteredMaterials.length})</h2>
+        <div className="flex items-center gap-4">
           <select
-            className="form-select"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
@@ -197,7 +197,7 @@ const MaterialsManager = () => {
             ))}
           </select>
           <button 
-            className="btn btn-primary"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
             onClick={() => openModal()}
           >
             Add Material
@@ -206,49 +206,49 @@ const MaterialsManager = () => {
       </div>
 
       {filteredMaterials.length === 0 ? (
-        <div className="empty-state">
-          <h3>
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">
             {filterCategory 
               ? `No materials found in "${filterCategory}"` 
               : 'No study materials yet'
             }
           </h3>
-          <p>
+          <p className="text-gray-500 mb-6">
             {filterCategory
               ? 'Try selecting a different category or add new materials.'
               : 'Add your first study material to help students learn.'
             }
           </p>
           <button 
-            className="btn btn-primary"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
             onClick={() => openModal()}
           >
             Add First Material
           </button>
         </div>
       ) : (
-        <div className="materials-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMaterials.map(material => {
             const isExpanded = expandedItems.has(material._id);
             const shouldTruncate = !isExpanded && isDescriptionLong(material.description);
             
             return (
-              <div key={material._id} className="material-card">
-                <div className="material-header">
-                  <div className="material-info">
-                    <h3>{material.title}</h3>
-                    <span className="material-category">{material.category}</span>
+              <div key={material._id} className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{material.title}</h3>
+                    <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">{material.category}</span>
                   </div>
-                  <div className="material-actions">
+                  <div className="flex gap-2">
                     <button 
-                      className="btn-icon btn-edit"
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200"
                       onClick={() => openModal(material)}
                       title="Edit material"
                     >
                       <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button 
-                      className="btn-icon btn-delete"
+                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-200"
                       onClick={() => handleDelete(material._id, material.title)}
                       title="Delete material"
                     >
@@ -259,13 +259,13 @@ const MaterialsManager = () => {
                 
                 {material.description && (
                   <>
-                    <div className={`material-description ${shouldTruncate ? 'collapsed' : ''}`}>
+                    <div className={`text-gray-600 mb-4 ${shouldTruncate ? 'line-clamp-3' : ''}`}>
                       {material.description}
                     </div>
                     
                     {isDescriptionLong(material.description) && (
                       <button 
-                        className="show-more-btn"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4"
                         onClick={() => toggleExpanded(material._id)}
                       >
                         {isExpanded ? 'Show less' : 'Show more'}
@@ -274,10 +274,10 @@ const MaterialsManager = () => {
                   </>
                 )}
 
-                <div className="material-meta">
+                <div className="text-sm text-gray-500 mb-4">
                   <span>Added {formatDate(material.createdAt)}</span>
                   {material.updatedAt !== material.createdAt && (
-                    <span>Updated {formatDate(material.updatedAt)}</span>
+                    <span className="ml-2">Updated {formatDate(material.updatedAt)}</span>
                   )}
                 </div>
 
@@ -286,7 +286,7 @@ const MaterialsManager = () => {
                     href={material.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="material-link"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
                   >
                     <FontAwesomeIcon icon={faBook} /> View Material
                   </a>
@@ -298,21 +298,21 @@ const MaterialsManager = () => {
       )}
 
       {showModal && (
-        <div className="material-modal" onClick={closeModal}>
-          <div className="material-modal-content" onClick={e => e.stopPropagation()}>
-            <div className="material-modal-header">
-              <h3>{editingMaterial ? 'Edit Study Material' : 'Add New Study Material'}</h3>
-              <button className="modal-close" onClick={closeModal}>×</button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeModal}>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-800">{editingMaterial ? 'Edit Study Material' : 'Add New Study Material'}</h3>
+              <button className="text-gray-500 hover:text-gray-700 text-2xl" onClick={closeModal}>×</button>
             </div>
             
-            <form className="material-form" onSubmit={handleSubmit}>
+            <form className="p-6 space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="title" className="form-label">Title *</label>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input
                   type="text"
                   id="title"
                   name="title"
-                  className="form-input"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={formData.title}
                   onChange={handleInputChange}
                   required
@@ -320,13 +320,13 @@ const MaterialsManager = () => {
                 />
               </div>
 
-              <div className="form-row">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="category" className="form-label">Category *</label>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                   <select
                     id="category"
                     name="category"
-                    className="form-select"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     value={formData.category}
                     onChange={handleInputChange}
                     required
@@ -340,12 +340,12 @@ const MaterialsManager = () => {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="link" className="form-label">Link *</label>
+                  <label htmlFor="link" className="block text-sm font-medium text-gray-700 mb-1">Link *</label>
                   <input
                     type="url"
                     id="link"
                     name="link"
-                    className="form-input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     value={formData.link}
                     onChange={handleInputChange}
                     required
@@ -355,11 +355,11 @@ const MaterialsManager = () => {
               </div>
 
               <div>
-                <label htmlFor="description" className="form-label">Description</label>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   id="description"
                   name="description"
-                  className="form-textarea"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="4"
@@ -367,10 +367,10 @@ const MaterialsManager = () => {
                 />
               </div>
 
-              <div className="form-actions">
+              <div className="flex justify-end gap-3 pt-4">
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200"
                   onClick={closeModal}
                   disabled={submitting}
                 >
@@ -378,7 +378,7 @@ const MaterialsManager = () => {
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50"
                   disabled={submitting}
                 >
                   {submitting ? 'Saving...' : (editingMaterial ? 'Update Material' : 'Add Material')}
