@@ -108,6 +108,36 @@ router.get('/', auth, asyncHandler(async (req, res) => {
   });
 }));
 
+// @desc    Get mentor's tasks
+// @route   GET /api/tasks/mentor/me
+// @access  Private (Mentor/Admin only)
+router.get('/mentor/me', auth, requireRole(['mentor', 'admin']), asyncHandler(async (req, res) => {
+  // Find all teams where user is creator or mentor
+  const teams = await Team.find({
+    $or: [
+      { creator: req.user.id },
+      { mentors: req.user.id }
+    ]
+  }).select('_id');
+
+  const teamIds = teams.map(team => team._id);
+
+  // Find all tasks for these teams
+  const tasks = await Task.find({ team: { $in: teamIds } })
+    .populate('team', 'name description category')
+    .populate('creator', 'fullName email role')
+    .populate('submissions.student', 'fullName email role')
+    .populate('submissions.feedback.reviewedBy', 'fullName email role')
+    .sort({ createdAt: -1 });
+
+  res.json({
+    success: true,
+    data: {
+      tasks
+    }
+  });
+}));
+
 // @desc    Get single task
 // @route   GET /api/tasks/:id
 // @access  Private

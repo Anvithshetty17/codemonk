@@ -3,7 +3,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import api from '../../utils/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faEdit, faCamera, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 
 const MyProfile = () => {
   const { user, updateUser } = useAuth();
@@ -12,13 +13,18 @@ const MyProfile = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     whatsappNumber: '',
     areasOfInterest: '',
-    previousExperience: ''
+    previousExperience: '',
+    profileImage: '',
+    linkedinUrl: '',
+    githubUrl: '',
+    portfolioUrl: ''
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -35,10 +41,12 @@ const MyProfile = () => {
         fullName: user.fullName || '',
         phone: user.phone || '',
         whatsappNumber: user.whatsappNumber || '',
-        areasOfInterest: Array.isArray(user.areasOfInterest) 
-          ? user.areasOfInterest.join(', ') 
-          : user.areasOfInterest || '',
-        previousExperience: user.previousExperience || ''
+        areasOfInterest: user.areasOfInterest || '',
+        previousExperience: user.previousExperience || '',
+        profileImage: user.profileImage || '',
+        linkedinUrl: user.linkedinUrl || '',
+        githubUrl: user.githubUrl || '',
+        portfolioUrl: user.portfolioUrl || ''
       });
     }
   }, [user]);
@@ -94,6 +102,21 @@ const MyProfile = () => {
       newErrors.areasOfInterest = 'Please provide at least one area of interest';
     }
 
+    // Validate URLs
+    const urlPattern = /^https?:\/\/.+/;
+    
+    if (formData.linkedinUrl.trim() && !urlPattern.test(formData.linkedinUrl.trim())) {
+      newErrors.linkedinUrl = 'Please enter a valid LinkedIn URL (starting with http:// or https://)';
+    }
+
+    if (formData.githubUrl.trim() && !urlPattern.test(formData.githubUrl.trim())) {
+      newErrors.githubUrl = 'Please enter a valid GitHub URL (starting with http:// or https://)';
+    }
+
+    if (formData.portfolioUrl.trim() && !urlPattern.test(formData.portfolioUrl.trim())) {
+      newErrors.portfolioUrl = 'Please enter a valid portfolio URL (starting with http:// or https://)';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -121,6 +144,43 @@ const MyProfile = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file size (limit to 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showError('Image size should be less than 5MB');
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      showError('Please select an image file');
+      return;
+    }
+
+    setImageUploading(true);
+    const formDataImg = new FormData();
+    formDataImg.append('image', file);
+
+    try {
+      const response = await api.post('/api/users/profile/image', formDataImg, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setFormData(prev => ({ ...prev, profileImage: response.data.profileImage }));
+      updateUser(response.data.user);
+      showSuccess('Profile image updated successfully');
+    } catch (error) {
+      showError(error.response?.data?.message || 'Failed to upload image');
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   const handleUpdateProfile = async (e) => {
@@ -180,7 +240,11 @@ const MyProfile = () => {
       areasOfInterest: Array.isArray(user.areasOfInterest) 
         ? user.areasOfInterest.join(', ') 
         : user.areasOfInterest || '',
-      previousExperience: user.previousExperience || ''
+      previousExperience: user.previousExperience || '',
+      profileImage: user.profileImage || '',
+      linkedinUrl: user.linkedinUrl || '',
+      githubUrl: user.githubUrl || '',
+      portfolioUrl: user.portfolioUrl || ''
     });
   };
 
@@ -224,6 +288,45 @@ const MyProfile = () => {
 
           {isEditing ? (
             <form onSubmit={handleUpdateProfile} className="space-y-6">
+              {/* Profile Image Upload */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative mb-4">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                    {formData.profileImage ? (
+                      <img 
+                        src={formData.profileImage} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                        <FontAwesomeIcon icon={faUser} className="text-4xl text-gray-500" />
+                      </div>
+                    )}
+                  </div>
+                  <label 
+                    htmlFor="profileImage" 
+                    className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 cursor-pointer hover:bg-blue-700 transition-colors shadow-lg"
+                  >
+                    <FontAwesomeIcon icon={faCamera} className="text-sm" />
+                    <input
+                      id="profileImage"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={imageUploading}
+                    />
+                  </label>
+                </div>
+                {imageUploading && (
+                  <div className="flex items-center gap-2 text-blue-600">
+                    <FontAwesomeIcon icon={faUpload} className="animate-pulse" />
+                    <span className="text-sm">Uploading...</span>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
@@ -316,6 +419,69 @@ const MyProfile = () => {
                 />
               </div>
 
+              {/* Social Links Section */}
+              <div className="border-t pt-6">
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Social Links</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <FontAwesomeIcon icon={faLinkedin} className="text-blue-600 mr-2" />
+                      LinkedIn Profile
+                    </label>
+                    <input
+                      type="url"
+                      name="linkedinUrl"
+                      value={formData.linkedinUrl}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                        errors.linkedinUrl 
+                          ? 'border-red-500 focus:ring-red-100' 
+                          : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                      }`}
+                      placeholder="https://linkedin.com/in/your-profile"
+                    />
+                    {errors.linkedinUrl && <div className="text-red-500 text-xs mt-1">{errors.linkedinUrl}</div>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <FontAwesomeIcon icon={faGithub} className="text-gray-800 mr-2" />
+                      GitHub Profile
+                    </label>
+                    <input
+                      type="url"
+                      name="githubUrl"
+                      value={formData.githubUrl}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                        errors.githubUrl 
+                          ? 'border-red-500 focus:ring-red-100' 
+                          : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                      }`}
+                      placeholder="https://github.com/your-username"
+                    />
+                    {errors.githubUrl && <div className="text-red-500 text-xs mt-1">{errors.githubUrl}</div>}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Portfolio Website</label>
+                  <input
+                    type="url"
+                    name="portfolioUrl"
+                    value={formData.portfolioUrl}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                      errors.portfolioUrl 
+                        ? 'border-red-500 focus:ring-red-100' 
+                        : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                    }`}
+                    placeholder="https://your-portfolio.com"
+                  />
+                  {errors.portfolioUrl && <div className="text-red-500 text-xs mt-1">{errors.portfolioUrl}</div>}
+                </div>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
@@ -342,6 +508,23 @@ const MyProfile = () => {
             </form>
           ) : (
             <div className="space-y-4">
+              {/* Profile Image Display */}
+              <div className="flex justify-center mb-6">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                  {user?.profileImage ? (
+                    <img 
+                      src={user.profileImage} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                      <FontAwesomeIcon icon={faUser} className="text-4xl text-gray-500" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Full Name:</label>
@@ -377,6 +560,47 @@ const MyProfile = () => {
                 <label className="block text-sm font-medium text-gray-600 mb-1">Previous Experience:</label>
                 <span className="text-gray-900">{user?.previousExperience || 'Not provided'}</span>
               </div>
+
+              {/* Social Links Display */}
+              {(user?.linkedinUrl || user?.githubUrl || user?.portfolioUrl) && (
+                <div className="border-t pt-4">
+                  <label className="block text-sm font-medium text-gray-600 mb-3">Social Links:</label>
+                  <div className="flex flex-wrap gap-4">
+                    {user?.linkedinUrl && (
+                      <a
+                        href={user.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                      >
+                        <FontAwesomeIcon icon={faLinkedin} />
+                        LinkedIn
+                      </a>
+                    )}
+                    {user?.githubUrl && (
+                      <a
+                        href={user.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        <FontAwesomeIcon icon={faGithub} />
+                        GitHub
+                      </a>
+                    )}
+                    {user?.portfolioUrl && (
+                      <a
+                        href={user.portfolioUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                      >
+                        🌐 Portfolio
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">Member Since:</label>

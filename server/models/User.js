@@ -80,6 +80,43 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Debugging process cannot exceed 1000 characters']
   },
+  profileImage: {
+    type: String,
+    trim: true
+  },
+  linkedinUrl: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        if (!v) return true; // Optional field
+        return /^https?:\/\/.+/.test(v);
+      },
+      message: 'Please enter a valid LinkedIn URL starting with http:// or https://'
+    }
+  },
+  githubUrl: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        if (!v) return true; // Optional field
+        return /^https?:\/\/.+/.test(v);
+      },
+      message: 'Please enter a valid GitHub URL starting with http:// or https://'
+    }
+  },
+  portfolioUrl: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        if (!v) return true; // Optional field
+        return /^https?:\/\/.+/.test(v);
+      },
+      message: 'Please enter a valid portfolio URL starting with http:// or https://'
+    }
+  },
   role: {
     type: String,
     enum: ['student', 'mentor', 'admin'],
