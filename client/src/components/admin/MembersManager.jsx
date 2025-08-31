@@ -23,6 +23,9 @@ const MembersManager = () => {
       email: ''
     }
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { showSuccess, showError } = useToast();
 
@@ -85,6 +88,58 @@ const MembersManager = () => {
       }
     });
     setEditingMember(null);
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showError('Image size should be less than 5MB');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        showError('Please select a valid image file');
+        return;
+      }
+      
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!imageFile) return null;
+    
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', imageFile);
+      
+      const response = await api.post('/members/upload-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      if (response.data.success) {
+        return response.data.data.imageUrl;
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      showError('Failed to upload image');
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const openModal = (member = null) => {
@@ -120,6 +175,18 @@ const MembersManager = () => {
     setSubmitting(true);
 
     try {
+      // Upload image first if there's a new image file
+      let imageUrl = formData.image;
+      if (imageFile) {
+        const uploadedImageUrl = await uploadImage();
+        if (uploadedImageUrl) {
+          imageUrl = uploadedImageUrl;
+        } else {
+          // If image upload failed, don't proceed
+          return;
+        }
+      }
+
       const memberData = {
         name: formData.name.trim()
       };
@@ -137,8 +204,8 @@ const MembersManager = () => {
         memberData.email = formData.email.trim();
       }
 
-      if (formData.image && formData.image.trim()) {
-        memberData.image = formData.image.trim();
+      if (imageUrl && imageUrl.trim()) {
+        memberData.image = imageUrl.trim();
       }
 
       // Handle social links - only include if they have values
@@ -381,16 +448,69 @@ const MembersManager = () => {
               </div>
 
               <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">Profile Image URL (Recommended)</label>
-                <input
-                  type="url"
-                  id="image"
-                  name="image"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  value={formData.image}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/profile-image.jpg"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
+                
+                {/* Image Upload Section */}
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="imageFile" className="block text-sm text-gray-600 mb-2">Upload New Image (Recommended)</label>
+                    <input
+                      type="file"
+                      id="imageFile"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Max file size: 5MB. Supported formats: JPG, PNG, GIF, WebP</p>
+                  </div>
+                  
+                  {/* Image Preview */}
+                  {(imagePreview || (formData.image && !imageFile)) && (
+                    <div className="mt-3">
+                      <label className="block text-sm text-gray-600 mb-2">Preview:</label>
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={imagePreview || (formData.image.startsWith('http') ? formData.image : `/uploads/${formData.image}`)}
+                          alt="Preview"
+                          className="w-20 h-20 object-cover rounded-lg border border-gray-300"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                        {(imagePreview || imageFile) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setImageFile(null);
+                              setImagePreview(null);
+                            }}
+                            className="text-red-600 hover:text-red-800 text-sm"
+                          >
+                            Remove new image
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Alternative URL Input */}
+                  <div className="pt-2 border-t border-gray-200">
+                    <label htmlFor="image" className="block text-sm text-gray-600 mb-2">Or use Image URL</label>
+                    <input
+                      type="url"
+                      id="image"
+                      name="image"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={formData.image}
+                      onChange={handleInputChange}
+                      placeholder="https://example.com/profile-image.jpg"
+                      disabled={imageFile !== null}
+                    />
+                    {imageFile && (
+                      <p className="text-xs text-gray-500 mt-1">URL input is disabled when a file is selected</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -482,16 +602,16 @@ const MembersManager = () => {
                   type="button" 
                   className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200"
                   onClick={closeModal}
-                  disabled={submitting}
+                  disabled={submitting || uploadingImage}
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50"
-                  disabled={submitting}
+                  disabled={submitting || uploadingImage}
                 >
-                  {submitting ? 'Saving...' : (editingMember ? 'Update Member' : 'Add Member')}
+                  {uploadingImage ? 'Uploading Image...' : submitting ? 'Saving...' : (editingMember ? 'Update Member' : 'Add Member')}
                 </button>
               </div>
             </form>

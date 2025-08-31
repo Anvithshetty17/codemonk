@@ -125,11 +125,17 @@ const memberValidation = [
     .optional()
     .custom((value) => {
       if (value && value.trim() !== '') {
-        try {
-          new URL(value);
-          return true;
-        } catch {
-          throw new Error('Please enter a valid image URL');
+        // Check if it's a URL (starts with http/https) or just a filename
+        if (value.startsWith('http://') || value.startsWith('https://')) {
+          try {
+            new URL(value);
+            return true;
+          } catch {
+            throw new Error('Please enter a valid image URL');
+          }
+        } else {
+          // It's a filename from upload, just check if it's not empty
+          return value.trim().length > 0;
         }
       }
       return true;

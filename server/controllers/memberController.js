@@ -1,5 +1,7 @@
 const Member = require('../models/Member');
 const asyncHandler = require('../utils/asyncHandler');
+const path = require('path');
+const fs = require('fs');
 
 // @desc    Get all team members
 // @route   GET /api/members
@@ -79,6 +81,29 @@ const updateMember = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Upload team member image
+// @route   POST /api/members/upload-image
+// @access  Private/Admin
+const uploadImage = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: 'No image file uploaded'
+    });
+  }
+
+  // Return the filename that can be used to reference the image
+  const imageUrl = req.file.filename;
+
+  res.json({
+    success: true,
+    message: 'Image uploaded successfully',
+    data: {
+      imageUrl
+    }
+  });
+});
+
 // @desc    Delete team member
 // @route   DELETE /api/members/:id
 // @access  Private/Admin
@@ -104,5 +129,6 @@ module.exports = {
   getMembers,
   createMember,
   updateMember,
-  deleteMember
+  deleteMember,
+  uploadImage
 };

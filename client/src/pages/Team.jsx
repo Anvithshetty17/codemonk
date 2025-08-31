@@ -112,7 +112,7 @@ const Team = () => {
                 {/* Image Section with Gradient Overlay */}
                 <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100">
                   <motion.img 
-                    src={member.image} 
+                    src={member.image?.startsWith('http') ? member.image : `/uploads/${member.image}`} 
                     alt={member.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
