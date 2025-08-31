@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const OTP = require('../models/OTP');
 const asyncHandler = require('../utils/asyncHandler');
 const { generateToken, setTokenCookie, clearTokenCookie } = require('../utils/tokenUtils');
 
@@ -12,8 +13,31 @@ const register = asyncHandler(async (req, res) => {
     email, 
     password, 
     phone, 
-    whatsappNumber
+    whatsappNumber,
+    verificationToken
   } = req.body;
+
+  // Check if email verification is provided
+  if (!verificationToken) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email verification required. Please verify your email first.'
+    });
+  }
+
+  // Check if there's a verified OTP for this email
+  const verifiedOTP = await OTP.findOne({
+    email: email.toLowerCase(),
+    purpose: 'registration',
+    isUsed: true
+  });
+
+  if (!verifiedOTP) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email not verified. Please verify your email first.'
+    });
+  }
 
   // Check if user already exists by email
   const existingUserByEmail = await User.findOne({ email });
@@ -42,6 +66,12 @@ const register = asyncHandler(async (req, res) => {
     phone,
     whatsappNumber,
     role: 'student' // Explicitly set role to student for new registrations
+  });
+
+  // Clean up used OTP
+  await OTP.deleteMany({
+    email: email.toLowerCase(),
+    purpose: 'registration'
   });
 
   res.status(201).json({

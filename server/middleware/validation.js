@@ -37,7 +37,11 @@ const registerValidation = [
   body('whatsappNumber')
     .optional()
     .matches(/^[6-9]\d{9}$/)
-    .withMessage('Please enter a valid 10-digit WhatsApp number')
+    .withMessage('Please enter a valid 10-digit WhatsApp number'),
+    
+  body('verificationToken')
+    .notEmpty()
+    .withMessage('Email verification required')
 ];
 
 const loginValidation = [

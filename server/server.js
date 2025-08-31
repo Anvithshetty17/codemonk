@@ -17,6 +17,7 @@ const materialRoutes = require('./routes/materials');
 const announcementRoutes = require('./routes/announcements');
 const teamRoutes = require('./routes/teams');
 const taskRoutes = require('./routes/tasks');
+const otpRoutes = require('./routes/otp');
 
 // Connect to database
 connectDB();
@@ -90,6 +91,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/otp', authLimiter, otpRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/materials', materialRoutes);
