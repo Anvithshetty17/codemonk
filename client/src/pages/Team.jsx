@@ -5,11 +5,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLinkedin, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faGlobe, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
+/* === TREASURE HUNT START === */
+import { useTreasureHunt, EditableText } from '../utils/treasureHunt.jsx';
+/* === TREASURE HUNT END === */
 
 const Team = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showError } = useToast();
+  /* === TREASURE HUNT START === */
+  const { secondFound, handleSecondTreasure } = useTreasureHunt();
+  /* === TREASURE HUNT END === */
 
   useEffect(() => {
     fetchMembers();
@@ -58,7 +64,14 @@ const Team = () => {
           transition={{ duration: 0.8 }}
         >
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
-            Meet The Code Monk Team
+            Meet The {/* === TREASURE HUNT START === */}
+            <EditableText 
+              initialText="Cold"
+              targetText="Code"
+              onCorrectEdit={handleSecondTreasure}
+              isCompleted={secondFound}
+            />
+            {/* === TREASURE HUNT END === */} Monk Team
           </h1>
           <motion.div 
             className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-8 rounded-full"

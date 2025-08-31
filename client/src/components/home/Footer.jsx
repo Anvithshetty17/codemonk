@@ -6,8 +6,14 @@ import {
   faLinkedin, 
   faGithub 
 } from '@fortawesome/free-brands-svg-icons';
+/* === TREASURE HUNT START === */
+import { useTreasureHunt } from '../../utils/treasureHunt.jsx';
+/* === TREASURE HUNT END === */
 
 const Footer = () => {
+  /* === TREASURE HUNT START === */
+  const { firstFound, clickCount, handleFirstTreasure } = useTreasureHunt();
+  /* === TREASURE HUNT END === */
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-6xl mx-auto px-4">
@@ -29,8 +35,17 @@ const Footer = () => {
               className="text-2xl font-bold text-blue-400 mb-4"
               whileHover={{ scale: 1.05, color: "#60a5fa" }}
               transition={{ duration: 0.3 }}
+              /* === TREASURE HUNT START === */
+              onClick={handleFirstTreasure}
+              style={{ 
+                cursor: firstFound ? 'default' : 'pointer',
+                userSelect: 'none',
+                textShadow: clickCount > 0 && !firstFound ? '0 0 15px rgba(59, 130, 246, 0.7)' : 'none'
+              }}
+              title={firstFound ? 'First treasure found! ✨' : `Click ${6 - clickCount} more times for treasure!`}
+              /* === TREASURE HUNT END === */
             >
-              Code Monk
+              Code Monk {/* === TREASURE HUNT START === */}{firstFound && '✨'}{/* === TREASURE HUNT END === */}
             </motion.h3>
             <motion.p 
               className="text-gray-300 mb-2"
