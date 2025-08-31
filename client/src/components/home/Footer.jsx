@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { motion } from 'framer-motion';
 import { 
   faFacebook, 
   faInstagram, 
@@ -10,34 +11,74 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="footer-brand">
-            <h3 className="text-2xl font-bold text-blue-400 mb-4">Code Monk</h3>
-            <p className="text-gray-300 mb-2">Dept. Of MCA</p>
-            <p className="text-gray-400 leading-relaxed">NMAM Institute of Technology, Nitte, SH1, Karkala, Karnataka</p>
-          </div>
-          <div className="footer-social">
-            <h4 className="text-xl font-semibold mb-4">Connect With Us</h4>
-            <div className="flex space-x-4">
-              <a href="#" aria-label="Facebook" className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors duration-200">
-                <FontAwesomeIcon icon={faFacebook} className="text-white" />
-              </a>
-              <a href="#" aria-label="Instagram" className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors duration-200">
-                <FontAwesomeIcon icon={faInstagram} className="text-white" />
-              </a>
-              <a href="#" aria-label="LinkedIn" className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-800 transition-colors duration-200">
-                <FontAwesomeIcon icon={faLinkedin} className="text-white" />
-              </a>
-              <a href="#" aria-label="GitHub" className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors duration-200">
-                <FontAwesomeIcon icon={faGithub} className="text-white" />
-              </a>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-700 pt-8 text-center">
-          <p className="text-gray-400 mb-2">&copy; {new Date().getFullYear()} Code Monk. All rights reserved.</p>
-          <p className="text-gray-500 text-sm">Transforming Beginners into Experts!</p>
-        </div>
+        <motion.div 
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div 
+            className="footer-brand"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <motion.h3 
+              className="text-2xl font-bold text-blue-400 mb-4"
+              whileHover={{ scale: 1.05, color: "#60a5fa" }}
+              transition={{ duration: 0.3 }}
+            >
+              Code Monk
+            </motion.h3>
+            <motion.p 
+              className="text-gray-300 mb-2"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
+              Dept. Of MCA
+            </motion.p>
+            <motion.p 
+              className="text-gray-400 leading-relaxed"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+            >
+              NMAM Institute of Technology, Nitte, SH1, Karkala, Karnataka
+            </motion.p>
+          </motion.div>
+        </motion.div>
+        
+        <motion.div 
+          className="border-t border-gray-700 pt-8 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <motion.p 
+            className="text-gray-400 mb-2"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.7 }}
+          >
+            &copy; {new Date().getFullYear()} Code Monk. All rights reserved.
+          </motion.p>
+          <motion.p 
+            className="text-gray-500 text-sm"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.8 }}
+          >
+            Transforming Beginners into Experts!
+          </motion.p>
+        </motion.div>
       </div>
     </footer>
   );

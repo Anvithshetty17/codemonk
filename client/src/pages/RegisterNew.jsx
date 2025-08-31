@@ -57,17 +57,8 @@ const Register = () => {
     // USN validation
     if (!formData.usn.trim()) {
       newErrors.usn = 'USN is required';
-    } else {
-      const usnRegex = /^(NU25MCA|NU24MCA|NNM24MC|NNM25MC)(\d{1,3})$/i;
-      const usnMatch = formData.usn.trim().toUpperCase().match(usnRegex);
-      if (!usnMatch) {
-        newErrors.usn = 'USN must be in format NU25MCA, NU24MCA, NNM24MC, or NNM25MC followed by a number (e.g., NU25MCA001, NNM24MC015)';
-      } else {
-        const number = parseInt(usnMatch[2]);
-        if (number < 1 || number > 180) {
-          newErrors.usn = 'USN number must be between 1 and 180';
-        }
-      }
+    } else if (formData.usn.trim().length < 10) {
+      newErrors.usn = 'Please enter a valid USN';
     }
 
     // Email validation
@@ -185,7 +176,7 @@ const Register = () => {
                   value={formData.usn}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.usn ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="Enter your USN (e.g., NU25MCA001, NNM24MC015)"
+                  placeholder="Enter your USN"
                 />
                 {errors.usn && <p className="mt-1 text-sm text-red-600">{errors.usn}</p>}
               </div>

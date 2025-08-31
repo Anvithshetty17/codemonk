@@ -175,30 +175,11 @@ const updateProfile = asyncHandler(async (req, res) => {
     });
   }
 
-  // If USN is being updated, check if it's already taken by another user
-  if (req.body.usn && req.body.usn.toUpperCase() !== user.usn) {
-    const existingUser = await User.findOne({ 
-      usn: req.body.usn.toUpperCase(),
-      _id: { $ne: user._id }
-    });
-    
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'USN is already taken by another user'
-      });
-    }
-  }
-
   // Update allowed fields
-  const allowedUpdates = ['fullName', 'usn', 'phone', 'whatsappNumber', 'linkedinUrl', 'githubUrl', 'portfolioUrl'];
+  const allowedUpdates = ['fullName', 'phone', 'whatsappNumber', 'linkedinUrl', 'githubUrl', 'portfolioUrl'];
   allowedUpdates.forEach(update => {
     if (req.body[update] !== undefined) {
-      if (update === 'usn') {
-        user[update] = req.body[update].toUpperCase();
-      } else {
-        user[update] = req.body[update];
-      }
+      user[update] = req.body[update];
     }
   });
 

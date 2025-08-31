@@ -19,10 +19,11 @@ const getMembers = asyncHandler(async (req, res) => {
 // @route   POST /api/members
 // @access  Private/Admin
 const createMember = asyncHandler(async (req, res) => {
-  const { name, description, email, image, socialLinks } = req.body;
+  const { name, role, description, email, image, socialLinks } = req.body;
 
   const member = await Member.create({
     name,
+    role,
     description,
     email,
     image,
@@ -42,7 +43,7 @@ const createMember = asyncHandler(async (req, res) => {
 // @route   PUT /api/members/:id
 // @access  Private/Admin
 const updateMember = asyncHandler(async (req, res) => {
-  const { name, description, email, image, socialLinks } = req.body;
+  const { name, role, description, email, image, socialLinks } = req.body;
 
   let member = await Member.findById(req.params.id);
 
@@ -57,6 +58,7 @@ const updateMember = asyncHandler(async (req, res) => {
     req.params.id,
     {
       name,
+      role,
       description,
       email,
       image,

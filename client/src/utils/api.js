@@ -37,10 +37,16 @@ api.interceptors.response.use(
       // Clear token from localStorage if it exists
       localStorage.removeItem('authToken');
       
-      // Only redirect to login if not already on auth page
-      if (window.location.pathname !== '/auth') {
-        console.log('API: Unauthorized, redirecting to auth');
-        window.location.href = '/auth';
+      // Don't redirect to login if:
+      // 1. Already on login page
+      // 2. On home page (/)
+      // 3. The failed request was an auth check (/auth/me)
+      const currentPath = window.location.pathname;
+      const isAuthCheck = error.config?.url?.includes('/auth/me');
+      
+      if (currentPath !== '/login' && currentPath !== '/' && !isAuthCheck) {
+        console.log('API: Unauthorized, redirecting to login');
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

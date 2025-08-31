@@ -7,6 +7,11 @@ const memberSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Name cannot exceed 100 characters']
   },
+  role: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'Role cannot exceed 50 characters']
+  },
   description: {
     type: String,
     trim: true,
@@ -70,6 +75,17 @@ const memberSchema = new mongoose.Schema({
           return /^https?:\/\//.test(v);
         },
         message: 'Please enter a valid website URL'
+      }
+    },
+    email: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v) {
+          if (!v) return true;
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: 'Please enter a valid email address'
       }
     }
   }

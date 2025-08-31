@@ -11,13 +11,17 @@ const MembersManager = () => {
   const [editingMember, setEditingMember] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
+    role: '',
     description: '',
     email: '',
     image: '',
-    linkedin: '',
-    github: '',
-    twitter: '',
-    portfolio: ''
+    socialLinks: {
+      linkedin: '',
+      github: '',
+      twitter: '',
+      portfolio: '',
+      email: ''
+    }
   });
   const [submitting, setSubmitting] = useState(false);
   const { showSuccess, showError } = useToast();
@@ -48,22 +52,37 @@ const MembersManager = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name.startsWith('socialLinks.')) {
+      const field = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const resetForm = () => {
     setFormData({
       name: '',
+      role: '',
       description: '',
       email: '',
       image: '',
-      linkedin: '',
-      github: '',
-      twitter: '',
-      portfolio: ''
+      socialLinks: {
+        linkedin: '',
+        github: '',
+        twitter: '',
+        portfolio: '',
+        email: ''
+      }
     });
     setEditingMember(null);
   };
@@ -73,13 +92,17 @@ const MembersManager = () => {
       setEditingMember(member);
       setFormData({
         name: member.name || '',
+        role: member.role || '',
         description: member.description || '',
         email: member.email || '',
         image: member.image || '',
-        linkedin: member.socialLinks?.linkedin || '',
-        github: member.socialLinks?.github || '',
-        twitter: member.socialLinks?.twitter || '',
-        portfolio: member.socialLinks?.portfolio || ''
+        socialLinks: {
+          linkedin: member.socialLinks?.linkedin || '',
+          github: member.socialLinks?.github || '',
+          twitter: member.socialLinks?.twitter || '',
+          portfolio: member.socialLinks?.portfolio || '',
+          email: member.socialLinks?.email || ''
+        }
       });
     } else {
       resetForm();
@@ -98,22 +121,48 @@ const MembersManager = () => {
 
     try {
       const memberData = {
-        name: formData.name,
-        description: formData.description,
-        email: formData.email,
-        image: formData.image,
-        socialLinks: {
-          linkedin: formData.linkedin || undefined,
-          github: formData.github || undefined,
-          twitter: formData.twitter || undefined,
-          portfolio: formData.portfolio || undefined
-        }
+        name: formData.name.trim()
       };
 
-      // Remove undefined values from socialLinks
-      memberData.socialLinks = Object.fromEntries(
-        Object.entries(memberData.socialLinks).filter(([_, value]) => value !== undefined)
-      );
+      // Only add optional fields if they have values
+      if (formData.role && formData.role.trim()) {
+        memberData.role = formData.role.trim();
+      }
+
+      if (formData.description && formData.description.trim()) {
+        memberData.description = formData.description.trim();
+      }
+
+      if (formData.email && formData.email.trim()) {
+        memberData.email = formData.email.trim();
+      }
+
+      if (formData.image && formData.image.trim()) {
+        memberData.image = formData.image.trim();
+      }
+
+      // Handle social links - only include if they have values
+      const socialLinks = {};
+      if (formData.socialLinks.linkedin && formData.socialLinks.linkedin.trim()) {
+        socialLinks.linkedin = formData.socialLinks.linkedin.trim();
+      }
+      if (formData.socialLinks.github && formData.socialLinks.github.trim()) {
+        socialLinks.github = formData.socialLinks.github.trim();
+      }
+      if (formData.socialLinks.twitter && formData.socialLinks.twitter.trim()) {
+        socialLinks.twitter = formData.socialLinks.twitter.trim();
+      }
+      if (formData.socialLinks.portfolio && formData.socialLinks.portfolio.trim()) {
+        socialLinks.portfolio = formData.socialLinks.portfolio.trim();
+      }
+      if (formData.socialLinks.email && formData.socialLinks.email.trim()) {
+        socialLinks.email = formData.socialLinks.email.trim();
+      }
+
+      // Only add socialLinks if there are any
+      if (Object.keys(socialLinks).length > 0) {
+        memberData.socialLinks = socialLinks;
+      }
 
       let response;
       if (editingMember) {
@@ -207,6 +256,9 @@ const MembersManager = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800">{member.name}</h3>
+                    {member.role && (
+                      <p className="text-sm text-blue-600 font-medium mt-1">{member.role}</p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <button 
@@ -303,7 +355,20 @@ const MembersManager = () => {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">Role/Position (Recommended)</label>
+                <input
+                  type="text"
+                  id="role"
+                  name="role"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  placeholder="e.g. President, Vice President, Technical Lead"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email (Optional)</label>
                 <input
                   type="email"
                   id="email"
@@ -316,7 +381,7 @@ const MembersManager = () => {
               </div>
 
               <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">Profile Image URL</label>
+                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">Profile Image URL (Recommended)</label>
                 <input
                   type="url"
                   id="image"
@@ -346,54 +411,67 @@ const MembersManager = () => {
                 
                 <div className="space-y-3">
                   <div>
-                    <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">LinkedIn:</label>
+                    <label htmlFor="socialLinks.linkedin" className="block text-sm font-medium text-gray-700 mb-1">LinkedIn:</label>
                     <input
                       type="url"
-                      id="linkedin"
-                      name="linkedin"
+                      id="socialLinks.linkedin"
+                      name="socialLinks.linkedin"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.linkedin}
+                      value={formData.socialLinks.linkedin}
                       onChange={handleInputChange}
                       placeholder="https://linkedin.com/in/username"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="github" className="block text-sm font-medium text-gray-700 mb-1">GitHub:</label>
+                    <label htmlFor="socialLinks.github" className="block text-sm font-medium text-gray-700 mb-1">GitHub:</label>
                     <input
                       type="url"
-                      id="github"
-                      name="github"
+                      id="socialLinks.github"
+                      name="socialLinks.github"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.github}
+                      value={formData.socialLinks.github}
                       onChange={handleInputChange}
                       placeholder="https://github.com/username"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="twitter" className="block text-sm font-medium text-gray-700 mb-1">Twitter:</label>
+                    <label htmlFor="socialLinks.twitter" className="block text-sm font-medium text-gray-700 mb-1">Twitter:</label>
                     <input
                       type="url"
-                      id="twitter"
-                      name="twitter"
+                      id="socialLinks.twitter"
+                      name="socialLinks.twitter"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.twitter}
+                      value={formData.socialLinks.twitter}
                       onChange={handleInputChange}
                       placeholder="https://twitter.com/username"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="portfolio" className="block text-sm font-medium text-gray-700 mb-1">Portfolio:</label>
+                    <label htmlFor="socialLinks.portfolio" className="block text-sm font-medium text-gray-700 mb-1">Portfolio/Website:</label>
                     <input
                       type="url"
-                      id="portfolio"
-                      name="portfolio"
+                      id="socialLinks.portfolio"
+                      name="socialLinks.portfolio"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={formData.portfolio}
+                      value={formData.socialLinks.portfolio}
                       onChange={handleInputChange}
                       placeholder="https://portfolio.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="socialLinks.email" className="block text-sm font-medium text-gray-700 mb-1">Social Contact Email:</label>
+                    <input
+                      type="email"
+                      id="socialLinks.email"
+                      name="socialLinks.email"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={formData.socialLinks.email}
+                      onChange={handleInputChange}
+                      placeholder="public@example.com (separate from main email)"
                     />
                   </div>
                 </div>

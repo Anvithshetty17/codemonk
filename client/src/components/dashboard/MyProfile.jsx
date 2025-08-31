@@ -17,6 +17,7 @@ const MyProfile = () => {
   
   const [formData, setFormData] = useState({
     fullName: '',
+    usn: '',
     phone: '',
     whatsappNumber: '',
     areasOfInterest: '',
@@ -39,6 +40,7 @@ const MyProfile = () => {
     if (user) {
       setFormData({
         fullName: user.fullName || '',
+        usn: user.usn || '',
         phone: user.phone || '',
         whatsappNumber: user.whatsappNumber || '',
         areasOfInterest: user.areasOfInterest || '',
@@ -86,6 +88,22 @@ const MyProfile = () => {
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
+    }
+
+    // USN validation
+    if (!formData.usn.trim()) {
+      newErrors.usn = 'USN is required';
+    } else {
+      const usnRegex = /^(NU25MCA|NU24MCA|NNM24MC|NNM25MC)(\d{1,3})$/i;
+      const usnMatch = formData.usn.trim().toUpperCase().match(usnRegex);
+      if (!usnMatch) {
+        newErrors.usn = 'USN must be in format NU25MCA, NU24MCA, NNM24MC, or NNM25MC followed by a number (e.g., NU25MCA001, NNM24MC015)';
+      } else {
+        const number = parseInt(usnMatch[2]);
+        if (number < 1 || number > 180) {
+          newErrors.usn = 'USN number must be between 1 and 180';
+        }
+      }
     }
 
     if (!formData.phone.trim()) {
@@ -345,6 +363,25 @@ const MyProfile = () => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">USN *</label>
+                  <input
+                    type="text"
+                    name="usn"
+                    value={formData.usn}
+                    onChange={handleInputChange}
+                    placeholder="e.g., NU25MCA001, NU24MCA018, NNM24MC015"
+                    className={`w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 ${
+                      errors.usn 
+                        ? 'border-red-500 focus:ring-red-100' 
+                        : 'border-gray-300 focus:ring-blue-100 focus:border-blue-500'
+                    }`}
+                  />
+                  {errors.usn && <div className="text-red-500 text-xs mt-1">{errors.usn}</div>}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                   <input
                     type="email"
@@ -354,6 +391,8 @@ const MyProfile = () => {
                   />
                   <small className="text-xs text-gray-500 mt-1 block">Email cannot be changed</small>
                 </div>
+
+                <div></div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -531,9 +570,17 @@ const MyProfile = () => {
                   <span className="text-gray-900">{user?.fullName}</span>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">USN:</label>
+                  <span className="text-gray-900">{user?.usn}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Email:</label>
                   <span className="text-gray-900">{user?.email}</span>
                 </div>
+                <div></div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

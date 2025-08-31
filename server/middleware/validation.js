@@ -6,66 +6,38 @@ const registerValidation = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Full name must be between 2 and 100 characters'),
   
+  body('usn')
+    .trim()
+    .custom((value) => {
+      // USN formats: NU25MCA, NU24MCA, NNM24MC, NNM25MC + 2-3 digits (1-180)
+      const usnRegex = /^(NU25MCA|NU24MCA|NNM24MC|NNM25MC)(\d{1,3})$/i;
+      if (!usnRegex.test(value)) {
+        throw new Error('USN must be in format NU25MCA, NU24MCA, NNM24MC, or NNM25MC followed by a number');
+      }
+      const number = parseInt(value.match(/\d+$/)[0]);
+      if (number < 1 || number > 180) {
+        throw new Error('USN number must be between 1 and 180');
+      }
+      return true;
+    }),
+  
   body('email')
     .isEmail()
     .normalizeEmail()
     .withMessage('Please enter a valid email address'),
   
   body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
   
   body('phone')
-    .matches(/^(\+?[1-9]\d{1,14}|\d{10})$/)
-    .withMessage('Please enter a valid phone number'),
+    .matches(/^[6-9]\d{9}$/)
+    .withMessage('Please enter a valid 10-digit phone number'),
   
   body('whatsappNumber')
     .optional()
-    .matches(/^(\+?[1-9]\d{1,14}|\d{10})$/)
-    .withMessage('Please enter a valid WhatsApp number'),
-  
-  body('areasOfInterest')
-    .custom((value) => {
-      if (typeof value === 'string') {
-        return value.trim().length > 0;
-      }
-      if (Array.isArray(value)) {
-        return value.length > 0;
-      }
-      return false;
-    })
-    .withMessage('Please provide at least one area of interest'),
-  
-  body('previousExperience')
-    .optional()
-    .isLength({ max: 1000 })
-    .withMessage('Previous experience cannot exceed 1000 characters'),
-  
-  body('codingSkillsRating')
-    .isInt({ min: 1, max: 10 })
-    .withMessage('Coding skills rating must be a number between 1 and 10'),
-  
-  body('favoriteProgrammingLanguage')
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage('Favorite programming language is required and must not exceed 100 characters'),
-  
-  body('favoriteLanguageReason')
-    .trim()
-    .isLength({ min: 10, max: 500 })
-    .withMessage('Reason for favorite language must be between 10 and 500 characters'),
-  
-  body('proudProject')
-    .trim()
-    .isLength({ min: 20, max: 1000 })
-    .withMessage('Project description must be between 20 and 1000 characters'),
-  
-  body('debuggingProcess')
-    .trim()
-    .isLength({ min: 20, max: 1000 })
-    .withMessage('Debugging process description must be between 20 and 1000 characters')
+    .matches(/^[6-9]\d{9}$/)
+    .withMessage('Please enter a valid 10-digit WhatsApp number')
 ];
 
 const loginValidation = [
@@ -86,33 +58,33 @@ const updateProfileValidation = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Full name must be between 2 and 100 characters'),
   
+  body('usn')
+    .optional()
+    .trim()
+    .custom((value) => {
+      if (value) {
+        // USN formats: NU25MCA, NU24MCA, NNM24MC, NNM25MC + 2-3 digits (1-180)
+        const usnRegex = /^(NU25MCA|NU24MCA|NNM24MC|NNM25MC)(\d{1,3})$/i;
+        if (!usnRegex.test(value)) {
+          throw new Error('USN must be in format NU25MCA, NU24MCA, NNM24MC, or NNM25MC followed by a number');
+        }
+        const number = parseInt(value.match(/\d+$/)[0]);
+        if (number < 1 || number > 180) {
+          throw new Error('USN number must be between 1 and 180');
+        }
+      }
+      return true;
+    }),
+  
   body('phone')
     .optional()
-    .matches(/^(\+?[1-9]\d{1,14}|\d{10})$/)
-    .withMessage('Please enter a valid phone number'),
+    .matches(/^[6-9]\d{9}$/)
+    .withMessage('Please enter a valid 10-digit phone number'),
   
   body('whatsappNumber')
     .optional()
-    .matches(/^(\+?[1-9]\d{1,14}|\d{10})$/)
-    .withMessage('Please enter a valid WhatsApp number'),
-  
-  body('areasOfInterest')
-    .optional()
-    .custom((value) => {
-      if (typeof value === 'string') {
-        return value.trim().length > 0;
-      }
-      if (Array.isArray(value)) {
-        return value.length > 0;
-      }
-      return false;
-    })
-    .withMessage('Please provide at least one area of interest'),
-  
-  body('previousExperience')
-    .optional()
-    .isLength({ max: 1000 })
-    .withMessage('Previous experience cannot exceed 1000 characters')
+    .matches(/^[6-9]\d{9}$/)
+    .withMessage('Please enter a valid 10-digit WhatsApp number')
 ];
 
 const changePasswordValidation = [
@@ -121,10 +93,8 @@ const changePasswordValidation = [
     .withMessage('Current password is required'),
   
   body('newPassword')
-    .isLength({ min: 8 })
-    .withMessage('New password must be at least 8 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('New password must contain at least one lowercase letter, one uppercase letter, and one number')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters long')
 ];
 
 const memberValidation = [
@@ -133,24 +103,95 @@ const memberValidation = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Name must be between 2 and 100 characters'),
   
+  body('role')
+    .optional()
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage('Role cannot exceed 50 characters'),
+  
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Description cannot exceed 500 characters'),
+  
+  body('email')
+    .optional()
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please enter a valid email address'),
+  
   body('image')
-    .isURL()
-    .withMessage('Please enter a valid image URL'),
-  
-  body('links.linkedin')
     .optional()
-    .isURL()
-    .withMessage('Please enter a valid LinkedIn URL'),
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('Please enter a valid image URL');
+        }
+      }
+      return true;
+    }),
   
-  body('links.github')
+  body('socialLinks.linkedin')
     .optional()
-    .isURL()
-    .withMessage('Please enter a valid GitHub URL'),
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        if (!/^https?:\/\/(www\.)?linkedin\.com\//.test(value)) {
+          throw new Error('Please enter a valid LinkedIn URL');
+        }
+      }
+      return true;
+    }),
   
-  body('links.website')
+  body('socialLinks.github')
     .optional()
-    .isURL()
-    .withMessage('Please enter a valid website URL')
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        if (!/^https?:\/\/(www\.)?github\.com\//.test(value)) {
+          throw new Error('Please enter a valid GitHub URL');
+        }
+      }
+      return true;
+    }),
+  
+  body('socialLinks.twitter')
+    .optional()
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        if (!/^https?:\/\/(www\.)?twitter\.com\//.test(value)) {
+          throw new Error('Please enter a valid Twitter URL');
+        }
+      }
+      return true;
+    }),
+  
+  body('socialLinks.portfolio')
+    .optional()
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('Please enter a valid portfolio URL');
+        }
+      }
+      return true;
+    }),
+  
+  body('socialLinks.email')
+    .optional()
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          throw new Error('Please enter a valid email address');
+        }
+      }
+      return true;
+    })
 ];
 
 const materialValidation = [

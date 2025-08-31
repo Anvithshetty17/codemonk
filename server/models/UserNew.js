@@ -14,18 +14,8 @@ const userSchema = new mongoose.Schema({
     unique: true,
     uppercase: true,
     trim: true,
-    validate: {
-      validator: function(v) {
-        // USN formats: NU25MCA, NU24MCA, NNM24MC, NNM25MC + 2-3 digits (1-180)
-        const usnRegex = /^(NU25MCA|NU24MCA|NNM24MC|NNM25MC)(\d{1,3})$/i;
-        if (!usnRegex.test(v)) {
-          return false;
-        }
-        const number = parseInt(v.match(/\d+$/)[0]);
-        return number >= 1 && number <= 180;
-      },
-      message: 'USN must be in format NU25MCA, NU24MCA, NNM24MC, or NNM25MC followed by a number between 1-180 (e.g., NU25MCA001, NNM24MC015)'
-    }
+    minlength: [10, 'USN must be at least 10 characters'],
+    maxlength: [15, 'USN cannot exceed 15 characters']
   },
   email: {
     type: String,
