@@ -171,13 +171,13 @@ const Team = () => {
                           href={member.socialLinks.linkedin} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl flex items-center justify-center hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg"
+                          className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg"
                           aria-label={`${member.name}'s LinkedIn`}
                           title="LinkedIn"
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          <FontAwesomeIcon icon={faLinkedin} className="text-sm" />
+                          <FontAwesomeIcon icon={faLinkedin} className="text-sm text-white" />
                         </motion.a>
                       )}
                       
@@ -186,13 +186,13 @@ const Team = () => {
                           href={member.socialLinks.github} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="w-10 h-10 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl flex items-center justify-center hover:from-gray-900 hover:to-black transition-all duration-300 shadow-md hover:shadow-lg"
+                          className="w-10 h-10 bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg"
                           aria-label={`${member.name}'s GitHub`}
                           title="GitHub"
                           whileHover={{ scale: 1.1, rotate: -5 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          <FontAwesomeIcon icon={faGithub} className="text-sm" />
+                          <FontAwesomeIcon icon={faGithub} className="text-sm text-white" />
                         </motion.a>
                       )}
                       
@@ -201,13 +201,13 @@ const Team = () => {
                           href={member.socialLinks.twitter} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-500 text-white rounded-xl flex items-center justify-center hover:from-blue-500 hover:to-blue-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                          className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-500 text-white hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg"
                           aria-label={`${member.name}'s Twitter`}
                           title="Twitter"
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          <FontAwesomeIcon icon={faTwitter} className="text-sm" />
+                          <FontAwesomeIcon icon={faTwitter} className="text-sm text-white" />
                         </motion.a>
                       )}
                       
@@ -216,26 +216,26 @@ const Team = () => {
                           href={member.socialLinks.portfolio} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="w-10 h-10 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl flex items-center justify-center hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg"
+                          className="w-10 h-10 bg-gradient-to-r from-green-600 to-green-700 text-white hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg"
                           aria-label={`${member.name}'s Portfolio`}
                           title="Portfolio"
                           whileHover={{ scale: 1.1, rotate: -5 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          <FontAwesomeIcon icon={faGlobe} className="text-sm" />
+                          <FontAwesomeIcon icon={faGlobe} className="text-sm text-white" />
                         </motion.a>
                       )}
 
                       {member.socialLinks?.email && (
                         <motion.a 
                           href={`mailto:${member.socialLinks.email}`} 
-                          className="w-10 h-10 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl flex items-center justify-center hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-lg"
+                          className="w-10 h-10 bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg"
                           aria-label={`Email ${member.name}`}
                           title="Email"
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          <FontAwesomeIcon icon={faEnvelope} className="text-sm" />
+                          <FontAwesomeIcon icon={faEnvelope} className="text-sm text-white" />
                         </motion.a>
                       )}
                     </motion.div>
