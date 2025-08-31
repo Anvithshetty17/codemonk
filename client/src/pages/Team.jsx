@@ -26,7 +26,11 @@ const Team = () => {
       const response = await api.get('/members');
       if (response.data.success) {
         console.log('Team members loaded:', response.data.data.members);
-        setMembers(response.data.data.members);
+        // Sort members alphabetically by name
+        const sortedMembers = response.data.data.members.sort((a, b) => 
+          a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })
+        );
+        setMembers(sortedMembers);
       }
     } catch (error) {
       console.error('Error fetching members:', error);
