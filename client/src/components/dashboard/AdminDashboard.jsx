@@ -31,9 +31,6 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalUsers: 0,
-    totalTeams: 0,
-    totalTasks: 0,
-    pendingReviews: 0,
     activeMembers: 0,
     recentActivities: []
   });
@@ -47,46 +44,18 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch multiple endpoints to build comprehensive stats
-      const [usersRes, teamsRes, tasksRes] = await Promise.all([
-        api.get('/users'),
-        api.get('/teams'),
-        api.get('/tasks')
+      // Fetch user stats
+      const [usersRes] = await Promise.all([
+        api.get('/users')
       ]);
 
-      if (usersRes.data.success && teamsRes.data.success && tasksRes.data.success) {
+      if (usersRes.data.success) {
         const users = usersRes.data.data.users || [];
-        const teams = teamsRes.data.data.teams || [];
-        const tasks = tasksRes.data.data.tasks || [];
-
-        // Calculate pending reviews
-        const pendingReviews = tasks.reduce((total, task) => {
-          const pendingSubmissions = task.submissions?.filter(sub => sub.status === 'submitted') || [];
-          return total + pendingSubmissions.length;
-        }, 0);
 
         setStats({
           totalUsers: users.length,
-          totalTeams: teams.length,
-          totalTasks: tasks.length,
-          pendingReviews,
           activeMembers: users.filter(u => u.role !== 'admin').length,
-          recentActivities: [
-            ...teams.slice(-5).map(team => ({
-              id: team._id,
-              type: 'team_created',
-              message: `Team "${team.name}" was created`,
-              date: team.createdAt,
-              user: team.creator?.fullName || 'Unknown'
-            })),
-            ...tasks.slice(-5).map(task => ({
-              id: task._id,
-              type: 'task_created',
-              message: `Task "${task.title}" was assigned`,
-              date: task.createdAt,
-              user: task.creator?.fullName || 'Unknown'
-            }))
-          ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10)
+          recentActivities: []
         });
       }
     } catch (error) {
@@ -176,27 +145,6 @@ const AdminDashboard = () => {
                   subText="All registered users"
                 />
                 <StatCard
-                  title="Active Teams"
-                  value={stats.totalTeams}
-                  icon={faBuilding}
-                  color="green"
-                  subText="Learning teams"
-                />
-                <StatCard
-                  title="Total Tasks"
-                  value={stats.totalTasks}
-                  icon={faTasks}
-                  color="purple"
-                  subText="Assigned tasks"
-                />
-                <StatCard
-                  title="Pending Reviews"
-                  value={stats.pendingReviews}
-                  icon={faExclamationTriangle}
-                  color="orange"
-                  subText="Need attention"
-                />
-                <StatCard
                   title="Students & Mentors"
                   value={stats.activeMembers}
                   icon={faUserGraduate}
@@ -208,33 +156,7 @@ const AdminDashboard = () => {
               {/* Quick Actions */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <a
-                    href="/teams"
-                    className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 transition-colors duration-200 group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FontAwesomeIcon icon={faBuilding} className="text-blue-600 text-xl" />
-                      <div>
-                        <h4 className="font-medium text-gray-900 group-hover:text-blue-900">Manage Teams</h4>
-                        <p className="text-sm text-gray-600">View and organize learning teams</p>
-                      </div>
-                    </div>
-                  </a>
-                  
-                  <a
-                    href="/tasks"
-                    className="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-4 transition-colors duration-200 group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FontAwesomeIcon icon={faTasks} className="text-green-600 text-xl" />
-                      <div>
-                        <h4 className="font-medium text-gray-900 group-hover:text-green-900">Review Tasks</h4>
-                        <p className="text-sm text-gray-600">Monitor task progress and submissions</p>
-                      </div>
-                    </div>
-                  </a>
-                  
+                <div className="grid grid-cols-1 gap-4">
                   <button
                     onClick={() => setActiveTab('members')}
                     className="bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-4 transition-colors duration-200 group text-left"

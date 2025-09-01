@@ -198,6 +198,8 @@ const getMyProfile = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const { 
     fullName, 
+    email,
+    usn,
     phone, 
     whatsappNumber, 
     areasOfInterest, 
@@ -228,6 +230,8 @@ const updateProfile = asyncHandler(async (req, res) => {
 
   // Update fields
   if (fullName !== undefined) user.fullName = fullName;
+  if (email !== undefined) user.email = email;
+  if (usn !== undefined) user.usn = usn;
   if (phone !== undefined) user.phone = phone;
   if (whatsappNumber !== undefined) user.whatsappNumber = whatsappNumber;
   if (areasOfInterest !== undefined) user.areasOfInterest = processedAreasOfInterest;
@@ -246,6 +250,7 @@ const updateProfile = asyncHandler(async (req, res) => {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
+        usn: user.usn,
         phone: user.phone,
         whatsappNumber: user.whatsappNumber,
         areasOfInterest: user.areasOfInterest,
@@ -347,11 +352,26 @@ const updateUserRole = asyncHandler(async (req, res) => {
   });
 });
 
+
+// @desc    Delete a user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+  await user.deleteOne();
+  res.json({ success: true, message: 'User deleted successfully' });
+});
+
 module.exports = {
   uploadProfileImage,
   getUsers,
   getMyProfile,
   updateProfile,
   changePassword,
-  updateUserRole
+  updateUserRole,
+  deleteUser
 };

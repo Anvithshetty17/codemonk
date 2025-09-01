@@ -3,14 +3,16 @@ import StudentsTable from '../components/admin/StudentsTable';
 import MembersManager from '../components/admin/MembersManager';
 import AnnouncementsManager from '../components/admin/AnnouncementsManager';
 import MaterialsManager from '../components/admin/MaterialsManager';
+import GroupManager from '../components/admin/GroupManager';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faTrophy, faBullhorn, faBook } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faTrophy, faBullhorn, faBook, faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
 const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState('students');
 
   const sections = [
     { id: 'students', label: 'Students', icon: faUsers, component: StudentsTable },
+    { id: 'groups', label: 'Groups', icon: faProjectDiagram, component: GroupManager },
     { id: 'members', label: 'Team Members', icon: faTrophy, component: MembersManager },
     { id: 'announcements', label: 'Announcements', icon: faBullhorn, component: AnnouncementsManager },
     { id: 'materials', label: 'Study Materials', icon: faBook, component: MaterialsManager }

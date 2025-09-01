@@ -15,7 +15,7 @@ const userRoutes = require('./routes/users');
 const memberRoutes = require('./routes/members');
 const materialRoutes = require('./routes/materials');
 const announcementRoutes = require('./routes/announcements');
-const teamRoutes = require('./routes/teams');
+const groupRoutes = require('./routes/groups');
 const taskRoutes = require('./routes/tasks');
 const otpRoutes = require('./routes/otp');
 
@@ -96,7 +96,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/announcements', announcementRoutes);
-app.use('/api/teams', teamRoutes);
+app.use('/api/groups', groupRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // Serve static files from the React app in production

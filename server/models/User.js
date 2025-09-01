@@ -102,6 +102,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['student', 'mentor', 'admin'],
     default: 'student'
+  },
+  points: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  completedTasks: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  rank: {
+    type: Number,
+    default: null
   }
 }, {
   timestamps: true

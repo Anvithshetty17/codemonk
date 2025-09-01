@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import StudentDashboard from '../components/dashboard/StudentDashboard';
+import StudentGroupDashboard from '../components/dashboard/StudentGroupDashboard';
 import MentorDashboard from '../components/dashboard/MentorDashboard';
 import AdminDashboard from '../components/dashboard/AdminDashboard';
 import AnnouncementsList from '../components/dashboard/AnnouncementsList';
 import MaterialsList from '../components/dashboard/MaterialsList';
 import MyProfile from '../components/dashboard/MyProfile';
+import StudentTasks from '../components/dashboard/StudentTasks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBullhorn, 
@@ -14,7 +16,8 @@ import {
   faUsers, 
   faTasks,
   faUserShield,
-  faUserGraduate
+  faUserGraduate,
+  faProjectDiagram
 } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard = () => {
@@ -41,7 +44,9 @@ const Dashboard = () => {
       ];
     } else {
       return [
-        { id: 'main', label: 'My Teams & Tasks', icon: faUserGraduate },
+        { id: 'main', label: 'My Dashboard', icon: faUserGraduate },
+        { id: 'tasks', label: 'My Tasks', icon: faTasks },
+        { id: 'groups', label: 'My Groups', icon: faProjectDiagram },
         ...commonSections
       ];
     }
@@ -62,9 +67,9 @@ const Dashboard = () => {
       case 'admin': 
         return 'Manage the platform and oversee all activities';
       case 'mentor': 
-        return 'Guide your teams and review student submissions';
+        return 'Guide students and review their submissions';
       default: 
-        return 'Join teams, complete tasks, and enhance your skills';
+        return 'Complete tasks and enhance your skills';
     }
   };
 
@@ -119,6 +124,8 @@ const Dashboard = () => {
               {user?.role === 'student' && <StudentDashboard />}
             </>
           )}
+          {activeSection === 'groups' && <StudentGroupDashboard />}
+          {activeSection === 'tasks' && <StudentTasks />}
           {activeSection === 'announcements' && <AnnouncementsList />}
           {activeSection === 'materials' && <MaterialsList />}
           {activeSection === 'profile' && <MyProfile />}
