@@ -12,7 +12,8 @@ const register = asyncHandler(async (req, res) => {
     email, 
     password, 
     phone, 
-    whatsappNumber
+    whatsappNumber,
+    section
   } = req.body;
 
   // Check if user already exists by email
@@ -41,6 +42,7 @@ const register = asyncHandler(async (req, res) => {
     password,
     phone,
     whatsappNumber,
+    section: section ? section.toUpperCase() : undefined,
     role: 'student' // Explicitly set role to student for new registrations
   });
 
@@ -55,6 +57,7 @@ const register = asyncHandler(async (req, res) => {
         email: user.email,
         phone: user.phone,
         whatsappNumber: user.whatsappNumber,
+        section: user.section,
         role: user.role,
         createdAt: user.createdAt
       }
@@ -150,6 +153,7 @@ const getMe = asyncHandler(async (req, res) => {
         email: user.email,
         phone: user.phone,
         whatsappNumber: user.whatsappNumber,
+        section: user.section,
         profileImage: user.profileImage,
         linkedinUrl: user.linkedinUrl,
         githubUrl: user.githubUrl,
@@ -176,7 +180,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   }
 
   // Update allowed fields
-  const allowedUpdates = ['fullName', 'phone', 'whatsappNumber', 'linkedinUrl', 'githubUrl', 'portfolioUrl'];
+  const allowedUpdates = ['fullName', 'phone', 'whatsappNumber', 'section', 'linkedinUrl', 'githubUrl', 'portfolioUrl'];
   allowedUpdates.forEach(update => {
     if (req.body[update] !== undefined) {
       user[update] = req.body[update];
@@ -196,6 +200,7 @@ const updateProfile = asyncHandler(async (req, res) => {
         email: user.email,
         phone: user.phone,
         whatsappNumber: user.whatsappNumber,
+        section: user.section,
         profileImage: user.profileImage,
         linkedinUrl: user.linkedinUrl,
         githubUrl: user.githubUrl,

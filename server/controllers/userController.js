@@ -176,8 +176,10 @@ const getMyProfile = asyncHandler(async (req, res) => {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
+        usn: user.usn,
         phone: user.phone,
         whatsappNumber: user.whatsappNumber,
+        section: user.section,
         areasOfInterest: user.areasOfInterest,
         previousExperience: user.previousExperience,
         profileImage: user.profileImage,
@@ -201,7 +203,8 @@ const updateProfile = asyncHandler(async (req, res) => {
     email,
     usn,
     phone, 
-    whatsappNumber, 
+    whatsappNumber,
+    section,
     areasOfInterest, 
     previousExperience,
     linkedinUrl,
@@ -234,6 +237,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   if (usn !== undefined) user.usn = usn;
   if (phone !== undefined) user.phone = phone;
   if (whatsappNumber !== undefined) user.whatsappNumber = whatsappNumber;
+  if (section !== undefined) user.section = section.toUpperCase();
   if (areasOfInterest !== undefined) user.areasOfInterest = processedAreasOfInterest;
   if (previousExperience !== undefined) user.previousExperience = previousExperience;
   if (linkedinUrl !== undefined) user.linkedinUrl = linkedinUrl;
@@ -253,6 +257,7 @@ const updateProfile = asyncHandler(async (req, res) => {
         usn: user.usn,
         phone: user.phone,
         whatsappNumber: user.whatsappNumber,
+        section: user.section,
         areasOfInterest: user.areasOfInterest,
         previousExperience: user.previousExperience,
         profileImage: user.profileImage,

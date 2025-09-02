@@ -14,6 +14,7 @@ const register = asyncHandler(async (req, res) => {
     password, 
     phone, 
     whatsappNumber,
+    section,
     verificationToken
   } = req.body;
 
@@ -65,6 +66,7 @@ const register = asyncHandler(async (req, res) => {
     password,
     phone,
     whatsappNumber,
+    section: section.toUpperCase(),
     role: 'student' // Explicitly set role to student for new registrations
   });
 

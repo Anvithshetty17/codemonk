@@ -37,6 +37,9 @@ const corsOptions = {
     
     const allowedOrigins = [
       'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:3000',
       'https://codemonk.anvithshetty.me',
       'https://codemonk-anvith-shettys-projects.vercel.app',
       'https://opulent-space-rotary-phone-x55r5xwwg67c675p-5173.app.github.dev',
@@ -44,9 +47,12 @@ const corsOptions = {
       process.env.CLIENT_URL
     ].filter(Boolean); // Remove any undefined values
     
-    // In development, allow all GitHub Codespaces URLs
+    // In development, allow all localhost and GitHub Codespaces URLs
     if (process.env.NODE_ENV !== 'production' && origin) {
-      if (origin.includes('.app.github.dev')) {
+      if (origin.includes('localhost') || 
+          origin.includes('127.0.0.1') || 
+          origin.includes('.app.github.dev') ||
+          origin.includes('vscode-cdn.net')) {
         return callback(null, true);
       }
     }
@@ -54,6 +60,7 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('CORS rejected origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },

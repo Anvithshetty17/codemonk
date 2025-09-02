@@ -103,6 +103,13 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'mentor', 'admin'],
     default: 'student'
   },
+  section: {
+    type: String,
+    required: [true, 'Section is required'],
+    enum: ['A', 'B', 'C'],
+    uppercase: true,
+    trim: true
+  },
   points: {
     type: Number,
     default: 0,

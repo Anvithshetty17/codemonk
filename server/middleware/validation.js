@@ -38,6 +38,11 @@ const registerValidation = [
     .optional()
     .matches(/^[6-9]\d{9}$/)
     .withMessage('Please enter a valid 10-digit WhatsApp number'),
+  
+  body('section')
+    .trim()
+    .isIn(['A', 'B', 'C'])
+    .withMessage('Section must be A, B, or C'),
     
   body('verificationToken')
     .notEmpty()
@@ -88,7 +93,13 @@ const updateProfileValidation = [
   body('whatsappNumber')
     .optional()
     .matches(/^[6-9]\d{9}$/)
-    .withMessage('Please enter a valid 10-digit WhatsApp number')
+    .withMessage('Please enter a valid 10-digit WhatsApp number'),
+    
+  body('section')
+    .optional()
+    .trim()
+    .isIn(['A', 'B', 'C'])
+    .withMessage('Section must be A, B, or C')
 ];
 
 const changePasswordValidation = [

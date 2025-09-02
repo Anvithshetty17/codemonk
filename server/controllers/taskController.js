@@ -1,61 +1,82 @@
 const Task = require('../models/Task');
 const User = require('../models/User');
-const Group = require('../models/Group');
 const asyncHandler = require('../utils/asyncHandler');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, '../../client/public/uploads/tasks');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|txt|zip|rar/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only images, documents, and archive files are allowed!'));
+    }
+  }
+});
 
 // @desc    Create a new task
 // @route   POST /api/tasks
-// @access  Private/Admin
+// @access  Private (Mentor/Admin only)
 const createTask = asyncHandler(async (req, res) => {
-  const {
-    title,
-    description,
-    type,
-    difficulty,
-    points,
-    content,
-    assignedStudents, // Array of {studentId, dueDate}
-    tags,
-    estimatedTime
-  } = req.body;
+  const { title, description, instructions, points, deadline, assignedToSections, type, difficulty } = req.body;
 
-  // Validate assigned students
-  if (assignedStudents && assignedStudents.length > 0) {
-    const studentIds = assignedStudents.map(assignment => assignment.studentId);
-    const students = await User.find({ 
-      _id: { $in: studentIds }, 
-      role: 'student' 
+  // Validate user role
+  if (req.user.role !== 'mentor' && req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Only mentors and admins can create tasks'
     });
-    
-    if (students.length !== studentIds.length) {
-      return res.status(400).json({
-        success: false,
-        message: 'One or more assigned users are not students'
-      });
-    }
+  }
+
+  // Validate sections
+  const validSections = ['A', 'B', 'C'];
+  const sections = Array.isArray(assignedToSections) ? assignedToSections : [assignedToSections];
+  const invalidSections = sections.filter(section => !validSections.includes(section));
+  
+  if (invalidSections.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid sections: ${invalidSections.join(', ')}`
+    });
   }
 
   const task = await Task.create({
     title,
     description,
+    instructions,
+    points,
+    deadline: new Date(deadline),
+    assignedToSections: sections,
     type,
     difficulty,
-    points,
-    content,
-    assignedTo: assignedStudents ? assignedStudents.map(assignment => ({
-      student: assignment.studentId,
-      dueDate: assignment.dueDate,
-      assignedAt: new Date()
-    })) : [],
-    createdBy: req.user.id,
-    tags,
-    estimatedTime
+    createdBy: req.user.id
   });
 
-  await task.populate([
-    { path: 'assignedTo.student', select: 'fullName email usn' },
-    { path: 'createdBy', select: 'fullName email' }
-  ]);
+  await task.populate('createdBy', 'fullName role');
 
   res.status(201).json({
     success: true,
@@ -64,115 +85,78 @@ const createTask = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get all tasks (with filters)
-// @route   GET /api/tasks
-// @access  Private
-const getTasks = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
-
-  // Build filter based on user role
-  let filter = { isActive: true };
-  
-  if (req.query.type) {
-    filter.type = req.query.type;
-  }
-  
-  if (req.query.difficulty) {
-    filter.difficulty = req.query.difficulty;
+// @desc    Get all tasks created by mentor
+// @route   GET /api/tasks/my-tasks
+// @access  Private (Mentor/Admin only)
+const getMyTasks = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'mentor' && req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied'
+    });
   }
 
-  if (req.query.tag) {
-    filter.tags = { $in: [req.query.tag] };
-  }
-
-  // If user is a student, only show tasks assigned to them
-  if (req.user.role === 'student') {
-    filter['assignedTo.student'] = req.user.id;
-  }
-
-  // If user is a mentor, show tasks assigned to students in their groups
-  if (req.user.role === 'mentor') {
-    const mentorGroups = await Group.find({ mentors: req.user.id });
-    const studentIds = mentorGroups.reduce((acc, group) => [...acc, ...group.students], []);
-    filter['assignedTo.student'] = { $in: studentIds };
-  }
-
-  const tasks = await Task.find(filter)
-    .populate([
-      { path: 'assignedTo.student', select: 'fullName email usn points' },
-      { path: 'assignedTo.reviewedBy', select: 'fullName email' },
-      { path: 'createdBy', select: 'fullName email' }
-    ])
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  const total = await Task.countDocuments(filter);
+  const tasks = await Task.find({ createdBy: req.user.id })
+    .populate('createdBy', 'fullName role')
+    .populate('submissions.student', 'fullName usn section')
+    .populate('submissions.reviewedBy', 'fullName role')
+    .sort({ createdAt: -1 });
 
   res.json({
     success: true,
-    data: {
-      tasks,
-      pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalTasks: total,
-        hasNextPage: page < Math.ceil(total / limit),
-        hasPrevPage: page > 1
-      }
-    }
+    data: { tasks }
   });
 });
 
-// @desc    Get student's tasks
-// @route   GET /api/tasks/my-tasks
-// @access  Private/Student
-const getMyTasks = asyncHandler(async (req, res) => {
-  const status = req.query.status;
-  
-  let filter = {
-    'assignedTo.student': req.user.id,
-    isActive: true
-  };
-
-  if (status) {
-    filter['assignedTo.status'] = status;
+// @desc    Get tasks for student's section
+// @route   GET /api/tasks/my-section
+// @access  Private (Student only)
+const getTasksForMySection = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({
+      success: false,
+      message: 'This endpoint is for students only'
+    });
   }
 
-  const tasks = await Task.find(filter)
-    .populate([
-      { path: 'assignedTo.reviewedBy', select: 'fullName email' },
-      { path: 'createdBy', select: 'fullName email' }
-    ])
-    .sort({ 'assignedTo.dueDate': 1 });
+  if (!req.user.section) {
+    return res.status(400).json({
+      success: false,
+      message: 'User section not found'
+    });
+  }
 
-  // Filter and format the response for the specific student
-  const formattedTasks = tasks.map(task => {
-    const studentAssignment = task.assignedTo.find(
-      assignment => assignment.student.toString() === req.user.id
-    );
-    
+  const tasks = await Task.getTasksForSection(req.user.section);
+
+  // Add submission status for each task
+  const tasksWithStatus = tasks.map(task => {
+    const submission = task.getSubmissionByStudent(req.user.id);
     return {
       ...task.toJSON(),
-      assignment: studentAssignment,
-      assignedTo: undefined // Remove all assignments for privacy
+      mySubmission: submission || null,
+      canSubmit: task.canStudentSubmit(req.user.id)
     };
   });
 
   res.json({
     success: true,
-    data: { tasks: formattedTasks }
+    data: { tasks: tasksWithStatus }
   });
 });
 
 // @desc    Submit task solution
 // @route   POST /api/tasks/:id/submit
-// @access  Private/Student
+// @access  Private (Student only)
 const submitTask = asyncHandler(async (req, res) => {
-  const { code, answers, notes, submissionUrl } = req.body;
+  const { content } = req.body;
   const taskId = req.params.id;
+
+  if (req.user.role !== 'student') {
+    return res.status(403).json({
+      success: false,
+      message: 'Only students can submit tasks'
+    });
+  }
 
   const task = await Task.findById(taskId);
   if (!task) {
@@ -182,102 +166,67 @@ const submitTask = asyncHandler(async (req, res) => {
     });
   }
 
-  const assignmentIndex = task.assignedTo.findIndex(
-    assignment => assignment.student.toString() === req.user.id
-  );
-
-  if (assignmentIndex === -1) {
-    return res.status(403).json({
-      success: false,
-      message: 'Task not assigned to you'
-    });
-  }
-
-  const assignment = task.assignedTo[assignmentIndex];
-  
-  if (assignment.status === 'Completed') {
+  // Check if student can submit
+  if (!task.canStudentSubmit(req.user.id)) {
     return res.status(400).json({
       success: false,
-      message: 'Task already completed'
+      message: 'Cannot submit this task. Either already submitted, task is overdue, or task is not published'
     });
   }
 
-  // Update submission
-  assignment.submission = {
-    code,
-    answers,
-    notes,
-    submissionUrl
-  };
-  assignment.submittedAt = new Date();
-  assignment.status = 'Submitted';
-
-  // If it was not started before, mark as started
-  if (!assignment.startedAt) {
-    assignment.startedAt = new Date();
+  // Check if student's section is assigned to this task
+  if (!task.assignedToSections.includes(req.user.section)) {
+    return res.status(403).json({
+      success: false,
+      message: 'This task is not assigned to your section'
+    });
   }
 
+  // Handle file attachments
+  let attachments = [];
+  if (req.files && req.files.length > 0) {
+    attachments = req.files.map(file => ({
+      filename: file.filename,
+      originalName: file.originalname,
+      path: `/uploads/tasks/${file.filename}`,
+      mimeType: file.mimetype,
+      size: file.size
+    }));
+  }
+
+  // Add submission to task
+  const submission = {
+    student: req.user.id,
+    content,
+    attachments,
+    submittedAt: new Date()
+  };
+
+  task.submissions.push(submission);
   await task.save();
+
+  await task.populate('submissions.student', 'fullName usn section');
 
   res.json({
     success: true,
     message: 'Task submitted successfully',
-    data: { assignment }
+    data: { submission: task.submissions[task.submissions.length - 1] }
   });
 });
 
-// @desc    Start working on a task
-// @route   POST /api/tasks/:id/start
-// @access  Private/Student
-const startTask = asyncHandler(async (req, res) => {
-  const taskId = req.params.id;
+// @desc    Review and grade submission
+// @route   PATCH /api/tasks/:taskId/submissions/:submissionId/review
+// @access  Private (Mentor/Admin only)
+const reviewSubmission = asyncHandler(async (req, res) => {
+  const { taskId, submissionId } = req.params;
+  const { status, feedback, pointsAwarded } = req.body;
 
-  const task = await Task.findById(taskId);
-  if (!task) {
-    return res.status(404).json({
-      success: false,
-      message: 'Task not found'
-    });
-  }
-
-  const assignmentIndex = task.assignedTo.findIndex(
-    assignment => assignment.student.toString() === req.user.id
-  );
-
-  if (assignmentIndex === -1) {
+  if (req.user.role !== 'mentor' && req.user.role !== 'admin') {
     return res.status(403).json({
       success: false,
-      message: 'Task not assigned to you'
+      message: 'Only mentors and admins can review submissions'
     });
   }
-
-  const assignment = task.assignedTo[assignmentIndex];
-  
-  if (assignment.startedAt) {
-    return res.status(400).json({
-      success: false,
-      message: 'Task already started'
-    });
-  }
-
-  assignment.startedAt = new Date();
-  assignment.status = 'In Progress';
-
-  await task.save();
-
-  res.json({
-    success: true,
-    message: 'Task started successfully',
-    data: { assignment }
-  });
-});
-
-// @desc    Review and grade task submission
-// @route   POST /api/tasks/:id/review
-// @access  Private/Admin/Mentor
-const reviewTask = asyncHandler(async (req, res) => {
-  const { studentId, grade, feedback, pointsAwarded } = req.body;
-  const taskId = req.params.id;
 
   const task = await Task.findById(taskId);
   if (!task) {
@@ -287,59 +236,157 @@ const reviewTask = asyncHandler(async (req, res) => {
     });
   }
 
-  const assignmentIndex = task.assignedTo.findIndex(
-    assignment => assignment.student.toString() === studentId
-  );
-
-  if (assignmentIndex === -1) {
+  const submission = task.submissions.id(submissionId);
+  if (!submission) {
     return res.status(404).json({
       success: false,
-      message: 'Assignment not found'
+      message: 'Submission not found'
     });
   }
 
-  const assignment = task.assignedTo[assignmentIndex];
-  
-  if (assignment.status !== 'Submitted') {
-    return res.status(400).json({
-      success: false,
-      message: 'Task must be submitted before review'
-    });
-  }
-
-  // Validate points awarded
-  const maxPoints = task.points;
-  if (pointsAwarded < 0 || pointsAwarded > maxPoints) {
-    return res.status(400).json({
-      success: false,
-      message: `Points awarded must be between 0 and ${maxPoints}`
-    });
-  }
-
-  // Update assignment
-  assignment.grade = grade;
-  assignment.feedback = feedback;
-  assignment.pointsAwarded = pointsAwarded;
-  assignment.reviewedBy = req.user.id;
-  assignment.reviewedAt = new Date();
-  assignment.completedAt = new Date();
-  assignment.status = 'Completed';
+  // Update submission
+  submission.status = status;
+  submission.feedback = feedback;
+  submission.pointsAwarded = Math.min(pointsAwarded || 0, task.points);
+  submission.reviewedBy = req.user.id;
+  submission.reviewedAt = new Date();
 
   await task.save();
 
-  // Update student's total points and completed tasks
-  const student = await User.findById(studentId);
-  student.points += pointsAwarded;
-  student.completedTasks += 1;
-  await student.save();
+  // If approved, update student points
+  if (status === 'approved') {
+    await User.findByIdAndUpdate(submission.student, {
+      $inc: { points: submission.pointsAwarded }
+    });
+  }
 
-  // Update leaderboard rankings
-  await updateLeaderboardRankings();
+  await task.populate('submissions.student', 'fullName usn section');
+  await task.populate('submissions.reviewedBy', 'fullName role');
 
   res.json({
     success: true,
-    message: 'Task reviewed successfully',
-    data: { assignment }
+    message: 'Submission reviewed successfully',
+    data: { submission }
+  });
+});
+
+// @desc    Update task
+// @route   PATCH /api/tasks/:id
+// @access  Private (Creator only)
+const updateTask = asyncHandler(async (req, res) => {
+  const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      message: 'Task not found'
+    });
+  }
+
+  // Check if user is the creator
+  if (task.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'You can only update your own tasks'
+    });
+  }
+
+  const allowedFields = ['title', 'description', 'instructions', 'points', 'deadline', 'assignedToSections', 'type', 'difficulty', 'status'];
+  const updates = {};
+
+  allowedFields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
+  });
+
+  if (updates.deadline) {
+    updates.deadline = new Date(updates.deadline);
+  }
+
+  Object.assign(task, updates);
+  await task.save();
+
+  await task.populate('createdBy', 'fullName role');
+
+  res.json({
+    success: true,
+    message: 'Task updated successfully',
+    data: { task }
+  });
+});
+
+// @desc    Delete task
+// @route   DELETE /api/tasks/:id
+// @access  Private (Creator/Admin only)
+const deleteTask = asyncHandler(async (req, res) => {
+  const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      message: 'Task not found'
+    });
+  }
+
+  // Check permissions
+  if (task.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'You can only delete your own tasks'
+    });
+  }
+
+  await Task.findByIdAndDelete(req.params.id);
+
+  res.json({
+    success: true,
+    message: 'Task deleted successfully'
+  });
+});
+
+// @desc    Get task by ID
+// @route   GET /api/tasks/:id
+// @access  Private
+const getTaskById = asyncHandler(async (req, res) => {
+  const task = await Task.findById(req.params.id)
+    .populate('createdBy', 'fullName role')
+    .populate('submissions.student', 'fullName usn section')
+    .populate('submissions.reviewedBy', 'fullName role');
+
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      message: 'Task not found'
+    });
+  }
+
+  // For students, check if they can access this task
+  if (req.user.role === 'student') {
+    if (!task.assignedToSections.includes(req.user.section)) {
+      return res.status(403).json({
+        success: false,
+        message: 'This task is not assigned to your section'
+      });
+    }
+
+    // Add submission status
+    const submission = task.getSubmissionByStudent(req.user.id);
+    const taskData = {
+      ...task.toJSON(),
+      mySubmission: submission || null,
+      canSubmit: task.canStudentSubmit(req.user.id)
+    };
+
+    return res.json({
+      success: true,
+      data: { task: taskData }
+    });
+  }
+
+  res.json({
+    success: true,
+    data: { task }
   });
 });
 
@@ -350,8 +397,8 @@ const getLeaderboard = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 50;
   
   const students = await User.find({ role: 'student' })
-    .select('fullName email usn points completedTasks rank profileImage')
-    .sort({ points: -1, completedTasks: -1, fullName: 1 })
+    .select('fullName usn section points')
+    .sort({ points: -1, fullName: 1 })
     .limit(limit);
 
   // Add position numbers
@@ -367,66 +414,15 @@ const getLeaderboard = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get task statistics
-// @route   GET /api/tasks/stats
-// @access  Private/Admin
-const getTaskStats = asyncHandler(async (req, res) => {
-  const totalTasks = await Task.countDocuments({ isActive: true });
-  const totalAssignments = await Task.aggregate([
-    { $match: { isActive: true } },
-    { $unwind: '$assignedTo' },
-    { $count: 'total' }
-  ]);
-
-  const completedAssignments = await Task.aggregate([
-    { $match: { isActive: true } },
-    { $unwind: '$assignedTo' },
-    { $match: { 'assignedTo.status': 'Completed' } },
-    { $count: 'total' }
-  ]);
-
-  const pendingReviews = await Task.aggregate([
-    { $match: { isActive: true } },
-    { $unwind: '$assignedTo' },
-    { $match: { 'assignedTo.status': 'Submitted' } },
-    { $count: 'total' }
-  ]);
-
-  const avgPoints = await User.aggregate([
-    { $match: { role: 'student' } },
-    { $group: { _id: null, avgPoints: { $avg: '$points' } } }
-  ]);
-
-  res.json({
-    success: true,
-    data: {
-      totalTasks,
-      totalAssignments: totalAssignments[0]?.total || 0,
-      completedAssignments: completedAssignments[0]?.total || 0,
-      pendingReviews: pendingReviews[0]?.total || 0,
-      averageStudentPoints: avgPoints[0]?.avgPoints || 0
-    }
-  });
-});
-
-// Helper function to update leaderboard rankings
-const updateLeaderboardRankings = async () => {
-  const students = await User.find({ role: 'student' })
-    .sort({ points: -1, completedTasks: -1, fullName: 1 });
-
-  for (let i = 0; i < students.length; i++) {
-    students[i].rank = i + 1;
-    await students[i].save();
-  }
-};
-
 module.exports = {
   createTask,
-  getTasks,
   getMyTasks,
+  getTasksForMySection,
   submitTask,
-  startTask,
-  reviewTask,
+  reviewSubmission,
+  updateTask,
+  deleteTask,
+  getTaskById,
   getLeaderboard,
-  getTaskStats
+  upload
 };

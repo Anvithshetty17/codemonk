@@ -5,23 +5,18 @@ const taskSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Task title is required'],
     trim: true,
-    maxlength: [200, 'Task title cannot exceed 200 characters']
+    maxlength: [200, 'Title cannot exceed 200 characters']
   },
   description: {
     type: String,
     required: [true, 'Task description is required'],
     trim: true,
-    maxlength: [2000, 'Task description cannot exceed 2000 characters']
+    maxlength: [2000, 'Description cannot exceed 2000 characters']
   },
-  type: {
+  instructions: {
     type: String,
-    enum: ['Coding', 'Reading', 'Project', 'Quiz', 'Assignment', 'Research'],
-    required: true
-  },
-  difficulty: {
-    type: String,
-    enum: ['Easy', 'Medium', 'Hard'],
-    default: 'Medium'
+    trim: true,
+    maxlength: [3000, 'Instructions cannot exceed 3000 characters']
   },
   points: {
     type: Number,
@@ -29,155 +24,140 @@ const taskSchema = new mongoose.Schema({
     min: [1, 'Points must be at least 1'],
     max: [1000, 'Points cannot exceed 1000']
   },
-  content: {
-    // For coding tasks
-    problemStatement: {
-      type: String,
-      trim: true
-    },
-    inputFormat: {
-      type: String,
-      trim: true
-    },
-    outputFormat: {
-      type: String,
-      trim: true
-    },
-    constraints: {
-      type: String,
-      trim: true
-    },
-    examples: [{
-      input: String,
-      output: String,
-      explanation: String
-    }],
-    // For reading tasks
-    readingMaterial: {
-      type: String,
-      trim: true
-    },
-    questions: [{
-      question: {
-        type: String,
-        required: true
+  deadline: {
+    type: Date,
+    required: [true, 'Deadline is required'],
+    validate: {
+      validator: function(value) {
+        return value > new Date();
       },
-      type: {
-        type: String,
-        enum: ['multiple-choice', 'short-answer', 'essay'],
-        default: 'short-answer'
-      },
-      options: [String], // For multiple choice
-      correctAnswer: String // For auto-grading
-    }],
-    // Common fields
-    resources: [{
-      title: String,
-      url: String,
-      type: {
-        type: String,
-        enum: ['Documentation', 'Video', 'Article', 'Tutorial', 'Other'],
-        default: 'Other'
-      }
-    }]
+      message: 'Deadline must be in the future'
+    }
   },
-  assignedTo: [{
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Creator is required']
+  },
+  assignedToSections: [{
+    type: String,
+    enum: ['A', 'B', 'C'],
+    required: true
+  }],
+  type: {
+    type: String,
+    enum: ['coding', 'assignment', 'project', 'quiz', 'research', 'other'],
+    default: 'assignment'
+  },
+  difficulty: {
+    type: String,
+    enum: ['easy', 'medium', 'hard'],
+    default: 'medium'
+  },
+  attachments: [{
+    filename: String,
+    originalName: String,
+    path: String,
+    mimeType: String,
+    size: Number
+  }],
+  submissions: [{
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },
-    assignedAt: {
+    submittedAt: {
       type: Date,
       default: Date.now
     },
-    dueDate: {
-      type: Date,
-      required: true
+    content: {
+      type: String,
+      required: true,
+      trim: true
     },
+    attachments: [{
+      filename: String,
+      originalName: String,
+      path: String,
+      mimeType: String,
+      size: Number
+    }],
     status: {
       type: String,
-      enum: ['Assigned', 'In Progress', 'Submitted', 'Completed', 'Overdue'],
-      default: 'Assigned'
-    },
-    startedAt: Date,
-    submittedAt: Date,
-    completedAt: Date,
-    submission: {
-      code: String, // For coding tasks
-      answers: [String], // For reading/quiz tasks
-      files: [String], // File paths for uploaded files
-      notes: String,
-      submissionUrl: String // For project submissions
+      enum: ['submitted', 'reviewed', 'approved', 'rejected'],
+      default: 'submitted'
     },
     feedback: {
       type: String,
       trim: true
     },
-    grade: {
-      type: Number,
-      min: 0,
-      max: 100
-    },
     pointsAwarded: {
       type: Number,
+      min: 0,
       default: 0
     },
     reviewedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
-    reviewedAt: Date
+    reviewedAt: {
+      type: Date
+    }
   }],
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  status: {
+    type: String,
+    enum: ['draft', 'published', 'closed'],
+    default: 'draft'
   },
   isActive: {
     type: Boolean,
     default: true
-  },
-  tags: [{
-    type: String,
-    trim: true
-  }],
-  estimatedTime: {
-    type: Number, // in minutes
-    min: 1
   }
 }, {
   timestamps: true
 });
 
-// Virtual for total assigned count
-taskSchema.virtual('totalAssigned').get(function() {
-  return this.assignedTo.length;
+// Index for better query performance
+taskSchema.index({ assignedToSections: 1, deadline: 1, status: 1 });
+taskSchema.index({ createdBy: 1, createdAt: -1 });
+taskSchema.index({ 'submissions.student': 1 });
+
+// Virtual for checking if task is overdue
+taskSchema.virtual('isOverdue').get(function() {
+  return new Date() > this.deadline && this.status === 'published';
 });
 
-// Virtual for completed count
-taskSchema.virtual('completedCount').get(function() {
-  return this.assignedTo.filter(assignment => assignment.status === 'Completed').length;
+// Virtual for submission count
+taskSchema.virtual('submissionCount').get(function() {
+  return this.submissions.length;
 });
 
-// Virtual for completion rate
-taskSchema.virtual('completionRate').get(function() {
-  if (this.assignedTo.length === 0) return 0;
-  return (this.completedCount / this.assignedTo.length) * 100;
-});
+// Method to check if student can submit
+taskSchema.methods.canStudentSubmit = function(studentId) {
+  const existingSubmission = this.submissions.find(
+    sub => sub.student.toString() === studentId.toString()
+  );
+  return !existingSubmission && !this.isOverdue && this.status === 'published';
+};
 
-// Virtual for average points awarded
-taskSchema.virtual('averagePoints').get(function() {
-  const completedTasks = this.assignedTo.filter(assignment => assignment.status === 'Completed');
-  if (completedTasks.length === 0) return 0;
-  const totalPoints = completedTasks.reduce((sum, assignment) => sum + assignment.pointsAwarded, 0);
-  return totalPoints / completedTasks.length;
-});
+// Method to get submission by student
+taskSchema.methods.getSubmissionByStudent = function(studentId) {
+  return this.submissions.find(
+    sub => sub.student.toString() === studentId.toString()
+  );
+};
 
-// Index for efficient queries
-taskSchema.index({ 'assignedTo.student': 1, 'assignedTo.status': 1 });
-taskSchema.index({ createdBy: 1 });
-taskSchema.index({ type: 1, difficulty: 1 });
+// Static method to get tasks for a specific section
+taskSchema.statics.getTasksForSection = function(section) {
+  return this.find({
+    assignedToSections: section,
+    status: 'published',
+    isActive: true
+  }).populate('createdBy', 'fullName role')
+    .populate('submissions.student', 'fullName usn section')
+    .populate('submissions.reviewedBy', 'fullName role');
+};
 
 // Include virtuals when converting to JSON
 taskSchema.set('toJSON', { virtuals: true });
