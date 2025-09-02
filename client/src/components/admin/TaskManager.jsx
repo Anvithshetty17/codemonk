@@ -12,7 +12,6 @@ import {
   faCheckCircle,
   faExclamationTriangle,
   faStar,
-  faUpload,
   faDownload,
   faUser,
   faCalendarAlt
@@ -30,14 +29,12 @@ const TaskManager = () => {
     title: '',
     description: '',
     instructions: '',
-    type: 'Assignment',
-    difficulty: 'Medium',
+    type: 'assignment',
+    difficulty: 'medium',
     points: 10,
     deadline: '',
     assignedToSections: ['A']
   });
-
-  const [taskFiles, setTaskFiles] = useState([]);
 
   useEffect(() => {
     fetchMyTasks();
@@ -62,27 +59,7 @@ const TaskManager = () => {
   const createTask = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      
-      // Append text fields
-      Object.keys(newTask).forEach(key => {
-        if (key === 'assignedToSections') {
-          formData.append(key, JSON.stringify(newTask[key]));
-        } else {
-          formData.append(key, newTask[key]);
-        }
-      });
-
-      // Append files
-      taskFiles.forEach(file => {
-        formData.append('attachments', file);
-      });
-
-      const response = await api.post('/tasks', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await api.post('/tasks', newTask);
 
       if (response.data.success) {
         showSuccess('Task created successfully');
@@ -93,6 +70,23 @@ const TaskManager = () => {
     } catch (error) {
       console.error('Error creating task:', error);
       showError(error.response?.data?.message || 'Failed to create task');
+    }
+  };
+
+  const updateTask = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.patch(`/tasks/${selectedTask._id}`, newTask);
+
+      if (response.data.success) {
+        showSuccess('Task updated successfully');
+        setShowModal(false);
+        resetForm();
+        fetchMyTasks();
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      showError(error.response?.data?.message || 'Failed to update task');
     }
   };
 
@@ -130,16 +124,16 @@ const TaskManager = () => {
       title: '',
       description: '',
       instructions: '',
-      type: 'Assignment',
-      difficulty: 'Medium',
+      type: 'assignment',
+      difficulty: 'medium',
       points: 10,
       deadline: '',
       assignedToSections: ['A']
     });
-    setTaskFiles([]);
   };
 
   const openModal = (type, task = null) => {
+    console.log('Opening modal with type:', type, 'and task:', task);
     setModalType(type);
     setSelectedTask(task);
     if (type === 'edit' && task) {
@@ -155,21 +149,13 @@ const TaskManager = () => {
       });
     }
     setShowModal(true);
+    console.log('Modal state set to:', true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setSelectedTask(null);
     resetForm();
-  };
-
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setTaskFiles(prev => [...prev, ...files]);
-  };
-
-  const removeFile = (index) => {
-    setTaskFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSectionChange = (section) => {
@@ -320,18 +306,23 @@ const TaskManager = () => {
         </div>
       )}
 
+      {/* Debug info */}
+      <div className="fixed top-4 right-4 bg-red-500 text-white p-2 rounded text-xs z-50">
+        Modal: {showModal.toString()}, Type: {modalType}
+      </div>
+
       {/* Create/Edit Task Modal */}
       {showModal && (modalType === 'create' || modalType === 'edit') && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeModal}>
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto border-2 border-gray-300" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
               <h3 className="text-xl font-semibold text-gray-800">
                 {modalType === 'create' ? 'Create New Task' : 'Edit Task'}
               </h3>
               <button className="text-gray-500 hover:text-gray-700 text-2xl" onClick={closeModal}>×</button>
             </div>
             
-            <form onSubmit={createTask} className="p-6 space-y-6">
+            <form onSubmit={modalType === 'create' ? createTask : updateTask} className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
@@ -365,11 +356,12 @@ const TaskManager = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
-                    <option value="Assignment">Assignment</option>
-                    <option value="Project">Project</option>
-                    <option value="Quiz">Quiz</option>
-                    <option value="Reading">Reading</option>
-                    <option value="Coding">Coding</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="project">Project</option>
+                    <option value="quiz">Quiz</option>
+                    <option value="research">Research</option>
+                    <option value="coding">Coding</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -381,9 +373,9 @@ const TaskManager = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
                   </select>
                 </div>
 
@@ -436,40 +428,6 @@ const TaskManager = () => {
                     </label>
                   ))}
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Attachments</label>
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt,.zip,.rar"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Supported formats: Images, PDF, Documents, Archives (Max 10MB each)
-                </p>
-                
-                {taskFiles.length > 0 && (
-                  <div className="mt-3">
-                    <h6 className="text-sm font-medium text-gray-700 mb-2">Selected Files:</h6>
-                    <div className="space-y-2">
-                      {taskFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <span className="text-sm text-gray-700">{file.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="text-red-600 hover:text-red-800 text-sm"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="flex justify-end gap-4">
