@@ -73,7 +73,8 @@ const createTask = asyncHandler(async (req, res) => {
     assignedToSections: sections,
     type,
     difficulty,
-    createdBy: req.user.id
+    createdBy: req.user.id,
+    status: 'published'
   });
 
   await task.populate('createdBy', 'fullName role');
