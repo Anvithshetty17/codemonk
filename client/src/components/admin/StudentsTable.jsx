@@ -159,6 +159,7 @@ const StudentsTable = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">USN</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -201,6 +202,9 @@ const StudentsTable = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {user.usn || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.section ? `Section ${user.section}` : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(user.createdAt)}
@@ -300,6 +304,10 @@ const StudentsTable = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700">USN:</label>
                       <span className="text-gray-900">{selectedUser.usn || 'Not provided'}</span>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Section:</label>
+                      <span className="text-gray-900">{selectedUser.section ? `Section ${selectedUser.section}` : 'Not provided'}</span>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Email:</label>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
+import TaskManager from '../admin/TaskManager';
 import api from '../../utils/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -286,104 +287,7 @@ const MentorDashboard = () => {
           )}
 
           {activeTab === 'tasks' && (
-            <div className="space-y-6">
-              {/* Pending Reviews Section */}
-              {getPendingSubmissions().length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-orange-600" />
-                    Pending Reviews ({getPendingSubmissions().length})
-                  </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {getPendingSubmissions().map(submission => (
-                      <div key={submission._id} className="border border-orange-200 rounded-lg p-4 bg-orange-50">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-medium text-gray-900">{submission.taskTitle}</h4>
-                            <p className="text-sm text-gray-600">By {submission.student.fullName}</p>
-                          </div>
-                          <button
-                            onClick={() => setReviewModal({ show: true, submission })}
-                            className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200"
-                          >
-                            Review
-                          </button>
-                        </div>
-                        <p className="text-sm text-gray-700 line-clamp-2 mb-2">{submission.content}</p>
-                        <div className="text-xs text-gray-500">
-                          Submitted {new Date(submission.submittedAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tasks List */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <FontAwesomeIcon icon={faTasks} className="text-blue-600" />
-                  All Tasks ({tasks.length})
-                </h3>
-                
-                {tasks.length === 0 ? (
-                  <div className="text-center py-8">
-                    <FontAwesomeIcon icon={faTasks} className="text-gray-300 text-4xl mb-3" />
-                    <p className="text-gray-500">No tasks created yet. Create your first task for a team.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {tasks.map(task => (
-                      <div key={task._id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h4 className="text-lg font-medium text-gray-900">{task.title}</h4>
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
-                                task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
-                                task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-green-100 text-green-800'
-                              }`}>
-                                {task.priority}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
-                              <span>Team: {task.team.name}</span>
-                              <span className="flex items-center gap-1">
-                                <FontAwesomeIcon icon={faCalendarAlt} />
-                                Due: {new Date(task.dueDate).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            task.status === 'active' ? 'bg-green-100 text-green-800' :
-                            task.status === 'draft' ? 'bg-gray-100 text-gray-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
-                            {task.status}
-                          </span>
-                        </div>
-                        
-                        <p className="text-gray-600 mb-3 line-clamp-2">{task.description}</p>
-                        
-                        <div className="flex justify-between items-center text-sm">
-                          <div className="text-gray-500">
-                            {task.submissions?.length || 0} submissions
-                          </div>
-                          <a
-                            href="/tasks"
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            View Details
-                          </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            <TaskManager />
           )}
         </div>
       </div>

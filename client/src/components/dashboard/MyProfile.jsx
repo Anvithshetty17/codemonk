@@ -34,7 +34,8 @@ const MyProfile = () => {
     email: '',
     usn: '',
     phone: '',
-    whatsappNumber: ''
+    whatsappNumber: '',
+    section: ''
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -52,7 +53,8 @@ const MyProfile = () => {
         email: user.email || '',
         usn: user.usn || '',
         phone: user.phone || '',
-        whatsappNumber: user.whatsappNumber || ''
+        whatsappNumber: user.whatsappNumber || '',
+        section: user.section || ''
       });
     }
   }, [user]);
@@ -80,6 +82,12 @@ const MyProfile = () => {
 
     if (formData.whatsappNumber && !/^\d{10}$/.test(formData.whatsappNumber.replace(/\D/g, ''))) {
       newErrors.whatsappNumber = 'WhatsApp number must be 10 digits';
+    }
+
+    if (!formData.section.trim()) {
+      newErrors.section = 'Section is required';
+    } else if (!['A', 'B', 'C'].includes(formData.section.toUpperCase())) {
+      newErrors.section = 'Please select a valid section (A, B, or C)';
     }
 
     setErrors(newErrors);
@@ -202,7 +210,8 @@ const MyProfile = () => {
         email: user.email || '',
         usn: user.usn || '',
         phone: user.phone || '',
-        whatsappNumber: user.whatsappNumber || ''
+        whatsappNumber: user.whatsappNumber || '',
+        section: user.section || ''
       });
     }
     
@@ -406,6 +415,33 @@ const MyProfile = () => {
                   </div>
                 )}
                 {errors.whatsappNumber && <p className="text-red-500 text-sm mt-1">{errors.whatsappNumber}</p>}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <FontAwesomeIcon icon={faIdCard} className="mr-2" />
+                  Section
+                </label>
+                {isEditing ? (
+                  <select
+                    name="section"
+                    value={formData.section}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.section ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Select your section</option>
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                    <option value="C">Section C</option>
+                  </select>
+                ) : (
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    {formData.section ? `Section ${formData.section}` : 'Not provided'}
+                  </div>
+                )}
+                {errors.section && <p className="text-red-500 text-sm mt-1">{errors.section}</p>}
               </div>
             </div>
           )}

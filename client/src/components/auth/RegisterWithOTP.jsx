@@ -41,7 +41,8 @@ const RegisterWithOTP = ({ onSuccess, onSwitchToLogin }) => {
     password: '',
     confirmPassword: '',
     phone: '',
-    whatsappNumber: ''
+    whatsappNumber: '',
+    section: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -286,6 +287,12 @@ const RegisterWithOTP = ({ onSuccess, onSwitchToLogin }) => {
       newErrors.whatsappNumber = 'Please enter a valid WhatsApp number';
     }
 
+    if (!formData.section?.trim()) {
+      newErrors.section = 'Please select your section';
+    } else if (!['A', 'B', 'C'].includes(formData.section.toUpperCase())) {
+      newErrors.section = 'Please select a valid section (A, B, or C)';
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       showError('Please fix the highlighted fields above');
@@ -300,6 +307,7 @@ const RegisterWithOTP = ({ onSuccess, onSwitchToLogin }) => {
         usn: formData.usn.trim().toUpperCase(),
         phone: formData.phone.trim(),
         whatsappNumber: formData.whatsappNumber?.trim() || undefined,
+        section: formData.section.toUpperCase(),
         verificationToken
       };
 
@@ -657,6 +665,32 @@ const RegisterWithOTP = ({ onSuccess, onSwitchToLogin }) => {
                       onChange={handleFormChange}
                     />
                   </div>
+                </div>
+
+                {/* Section */}
+                <div>
+                  <div className="relative">
+                    <FontAwesomeIcon 
+                      icon={faIdCard} 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                    />
+                    <select
+                      name="section"
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        errors.section ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      value={formData.section}
+                      onChange={handleFormChange}
+                    >
+                      <option value="">Select your section</option>
+                      <option value="A">Section A</option>
+                      <option value="B">Section B</option>
+                      <option value="C">Section C</option>
+                    </select>
+                  </div>
+                  {errors.section && (
+                    <p className="text-red-500 text-sm mt-1">{errors.section}</p>
+                  )}
                 </div>
 
                 <motion.button

@@ -10,6 +10,7 @@ const Register = () => {
     email: '',
     phoneNumber: '',
     whatsappNumber: '',
+    section: '',
     password: '',
     confirmPassword: ''
   });
@@ -80,6 +81,13 @@ const Register = () => {
       newErrors.whatsappNumber = 'Please enter a valid 10-digit WhatsApp number';
     }
 
+    // Section validation
+    if (!formData.section.trim()) {
+      newErrors.section = 'Section is required';
+    } else if (!['A', 'B', 'C'].includes(formData.section.toUpperCase())) {
+      newErrors.section = 'Please select a valid section (A, B, or C)';
+    }
+
     // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -114,6 +122,7 @@ const Register = () => {
         email: formData.email.trim().toLowerCase(),
         phone: formData.phoneNumber.trim(),
         whatsappNumber: formData.whatsappNumber.trim() || formData.phoneNumber.trim(),
+        section: formData.section.toUpperCase(),
         password: formData.password
       };
 
@@ -230,6 +239,26 @@ const Register = () => {
                   placeholder="Enter your WhatsApp number (if different from phone)"
                 />
                 {errors.whatsappNumber && <p className="mt-1 text-sm text-red-600">{errors.whatsappNumber}</p>}
+              </div>
+
+              {/* Section */}
+              <div>
+                <label htmlFor="section" className="block text-sm font-medium text-gray-700 mb-2">
+                  Section *
+                </label>
+                <select
+                  id="section"
+                  name="section"
+                  value={formData.section}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.section ? 'border-red-500' : 'border-gray-300'}`}
+                >
+                  <option value="">Select your section</option>
+                  <option value="A">Section A</option>
+                  <option value="B">Section B</option>
+                  <option value="C">Section C</option>
+                </select>
+                {errors.section && <p className="mt-1 text-sm text-red-600">{errors.section}</p>}
               </div>
 
               {/* Password */}
