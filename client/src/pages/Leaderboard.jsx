@@ -101,6 +101,7 @@ const Leaderboard = () => {
                       <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Rank</th>
                       <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Student</th>
                       <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">USN</th>
+                      <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Section</th>
                       <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Points</th>
                       <th className="px-8 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Tasks</th>
                     </tr>
@@ -160,6 +161,11 @@ const Leaderboard = () => {
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
                           <span className="text-gray-700 font-medium">{student.usn}</span>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Section {student.section || 'N/A'}
+                          </span>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
                           <div className="bg-yellow-100 rounded-lg px-3 py-2 flex items-center gap-2 w-fit">

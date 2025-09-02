@@ -19,7 +19,7 @@ import {
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
 const MyProfile = () => {
-  const { user, updateUserData } = useAuth();
+  const { user, updateUser } = useAuth();
   const { showSuccess, showError } = useToast();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -158,7 +158,7 @@ const MyProfile = () => {
 
       if (response.data.success) {
         showSuccess('Profile updated successfully');
-        updateUserData(response.data.data);
+        updateUser(response.data.data.user);
         setIsEditing(false);
       }
     } catch (error) {

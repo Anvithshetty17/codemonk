@@ -398,6 +398,7 @@ const GroupManager = () => {
                             <div className="font-medium">{student.fullName}</div>
                             <div className="text-sm text-gray-600">{student.email}</div>
                             {student.usn && <div className="text-sm text-gray-600">USN: {student.usn}</div>}
+                            {student.section && <div className="text-sm text-blue-600">Section: {student.section}</div>}
                           </div>
                         ))}
                       </div>
@@ -533,6 +534,7 @@ const GroupManager = () => {
                             <div className="font-medium text-gray-900">{student.fullName}</div>
                             <div className="text-sm text-gray-500">{student.email}</div>
                             {student.usn && <div className="text-xs text-gray-400">USN: {student.usn}</div>}
+                            {student.section && <div className="text-xs text-blue-600">Section: {student.section}</div>}
                           </div>
                         </label>
                       ))}
