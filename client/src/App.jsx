@@ -4,6 +4,9 @@ import { ToastProvider } from './contexts/ToastContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Team from './pages/Team';
+import Resources from './pages/Resources';
+import InterviewEssentials from './pages/InterviewEssentials';
+import InterviewEssentialsTest from './pages/InterviewEssentialsTest';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -24,8 +27,10 @@ function App() {
             <Navbar />
             <main>
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/team" element={<Team />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/interview-essentials" element={<InterviewEssentials />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={

@@ -51,8 +51,15 @@ const Navbar = () => {
               >
                 Team
               </Link>
+              <Link 
+                to="/resources" 
+                className={`py-4 md:py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors border-b border-gray-200 md:border-b-0 relative ${isActiveLink('/resources') ? 'text-blue-600 md:after:absolute md:after:bottom-[-0.5rem] md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-blue-600 md:after:rounded' : ''}`}
+                onClick={closeMenu}
+              >
+                Resources
+              </Link>
               
-              {isAuthenticated ? (
+              {/* {isAuthenticated ? (
                 <>
                   <Link 
                     to="/dashboard" 
@@ -101,11 +108,11 @@ const Navbar = () => {
                 >
                   Login
                 </Link>
-              )}
+              )} */}
             </div>
           </div>
 
-          <button 
+          {/* <button 
             className={`md:hidden flex flex-col gap-1 bg-transparent border-none cursor-pointer p-2 w-8 h-8 items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded ${isMenuOpen ? 'is-active' : ''}`}
             onClick={toggleMenu}
             aria-label="Toggle navigation menu"
@@ -113,7 +120,7 @@ const Navbar = () => {
             <span className={`w-5 h-0.5 bg-gray-700 rounded transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
             <span className={`w-5 h-0.5 bg-gray-700 rounded transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
             <span className={`w-5 h-0.5 bg-gray-700 rounded transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
-          </button>
+          </button> */}
         </div>
       </div>
     </nav>

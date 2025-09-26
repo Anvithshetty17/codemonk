@@ -41,6 +41,7 @@ const corsOptions = {
       'http://127.0.0.1:5173',
       'http://127.0.0.1:3000',
       'https://codemonk.anvithshetty.me',
+      'https://codemonk2k25.vercel.app',
       'https://codemonk-anvith-shettys-projects.vercel.app',
       'https://opulent-space-rotary-phone-x55r5xwwg67c675p-5173.app.github.dev',
       'https://opulent-space-rotary-phone-x55r5xwwg67c675p-5173.app.github.dev/',
