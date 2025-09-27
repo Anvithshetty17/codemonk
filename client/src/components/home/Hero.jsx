@@ -74,10 +74,10 @@ const Hero = () => {
               transition={{ type: "spring", stiffness: 300 }}
             >
               <Link 
-                to="/register" 
+                to="/resources" 
                 className="block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 hover:shadow-lg min-w-[200px]"
               >
-                Join Our Community
+                Resources
               </Link>
             </motion.div>
             
