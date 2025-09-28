@@ -81,16 +81,33 @@ const Cheatsheets = () => {
   };
 
   const handlePreview = (pdfPath) => {
-    // Check if it's a mobile device
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Check if it's a mobile device with more accurate detection
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                     (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+    
+    // Construct the full URL for the PDF
+    const fullPdfUrl = pdfPath.startsWith('http') ? pdfPath : `${window.location.origin}/${pdfPath}`;
     
     if (isMobile) {
-      // For mobile devices, force download or use Google Docs Viewer
-      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + '/' + pdfPath)}&embedded=true`;
+      // For mobile devices, use Google Docs Viewer
+      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
       window.open(googleDocsUrl, '_blank');
     } else {
-      // For desktop, open directly
-      window.open(pdfPath, '_blank');
+      // For desktop, try direct PDF opening first, fallback to Google Docs if needed
+      try {
+        const newWindow = window.open(fullPdfUrl, '_blank');
+        // Check if popup was blocked
+        if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+          // Fallback to Google Docs Viewer if popup blocked
+          const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
+          window.open(googleDocsUrl, '_blank');
+        }
+      } catch (error) {
+        console.error('Error opening PDF:', error);
+        // Fallback to Google Docs Viewer
+        const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
+        window.open(googleDocsUrl, '_blank');
+      }
     }
   };
 
