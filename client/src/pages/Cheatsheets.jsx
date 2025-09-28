@@ -81,7 +81,17 @@ const Cheatsheets = () => {
   };
 
   const handlePreview = (pdfPath) => {
-    window.open(pdfPath, '_blank');
+    // Check if it's a mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // For mobile devices, force download or use Google Docs Viewer
+      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + '/' + pdfPath)}&embedded=true`;
+      window.open(googleDocsUrl, '_blank');
+    } else {
+      // For desktop, open directly
+      window.open(pdfPath, '_blank');
+    }
   };
 
   if (isLoading) {
