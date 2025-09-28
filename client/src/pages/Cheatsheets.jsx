@@ -85,29 +85,43 @@ const Cheatsheets = () => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                      (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
     
-    // Construct the full URL for the PDF
-    const fullPdfUrl = pdfPath.startsWith('http') ? pdfPath : `${window.location.origin}/${pdfPath}`;
-    
-    if (isMobile) {
-      // For mobile devices, use Google Docs Viewer
-      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
-      window.open(googleDocsUrl, '_blank');
+    // Construct the full URL for the PDF - ensure proper path construction
+    let fullPdfUrl;
+    if (pdfPath.startsWith('http')) {
+      fullPdfUrl = pdfPath;
     } else {
-      // For desktop, try direct PDF opening first, fallback to Google Docs if needed
-      try {
-        const newWindow = window.open(fullPdfUrl, '_blank');
-        // Check if popup was blocked
-        if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-          // Fallback to Google Docs Viewer if popup blocked
-          const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
+      // Remove leading slash if present and add it properly
+      const cleanPath = pdfPath.startsWith('/') ? pdfPath.substring(1) : pdfPath;
+      fullPdfUrl = `${window.location.origin}/${cleanPath}`;
+    }
+    
+    // For both mobile and desktop, use Google Docs Viewer for better compatibility on Vercel
+    const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
+    
+    // Try direct PDF first for desktop, then fallback to Google Docs
+    if (!isMobile) {
+      // Test if the PDF exists by trying to fetch it first
+      fetch(fullPdfUrl, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            // PDF exists, try to open it directly
+            const newWindow = window.open(fullPdfUrl, '_blank');
+            // If popup blocked or failed, use Google Docs
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+              window.open(googleDocsUrl, '_blank');
+            }
+          } else {
+            // PDF doesn't exist or can't be accessed, use Google Docs
+            window.open(googleDocsUrl, '_blank');
+          }
+        })
+        .catch(() => {
+          // Error checking PDF, use Google Docs as fallback
           window.open(googleDocsUrl, '_blank');
-        }
-      } catch (error) {
-        console.error('Error opening PDF:', error);
-        // Fallback to Google Docs Viewer
-        const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
-        window.open(googleDocsUrl, '_blank');
-      }
+        });
+    } else {
+      // For mobile, always use Google Docs Viewer
+      window.open(googleDocsUrl, '_blank');
     }
   };
 
