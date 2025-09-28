@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "title": "75 DSA Questions from LeetCode",
+    "description": "Essential 75 Data Structures and Algorithms problems from LeetCode with categorized C++ solutions for interview preparation.",
+    "category": "Data Structures & Algorithms",
+    "pdfPath": "cheatsheets/75 DSA Questions from Leetcode.pdf",
+    "color": "from-blue-600 to-blue-800",
+    "icon": "code"
+  },
+  {
+    "id": 2,
+    "title": "100 Most Asked SQL Q&A",
+    "description": "Top 100 frequently asked SQL interview questions covering queries, joins, keys, normalization, indexes, and transactions.",
+    "category": "Databases",
+    "pdfPath": "cheatsheets/100 Most Asked SQL Q&A.pdf",
+    "color": "from-green-500 to-green-700",
+    "icon": "database"
+  },
+  {
+    "id": 3,
+    "title": "JavaScript Interview Questions",
+    "description": "Comprehensive JavaScript interview questions with explanations covering ES6+ features, scope, closures, and core concepts.",
+    "category": "Programming Languages",
+    "pdfPath": "cheatsheets/JavaScript Interview Questions (with_Answers).pdf",
+    "color": "from-yellow-400 to-orange-600",
+    "icon": "javascript"
+  },
+  {
+    "id": 4,
+    "title": "Python Interview Questions",
+    "description": "120+ advanced Python interview questions with solutions covering OOP, decorators, Flask, Django, and Python 3.x features.",
+    "category": "Programming Languages",
+    "pdfPath": "cheatsheets/Advanced Python Interview Questions.pdf",
+    "color": "from-green-400 to-teal-600",
+    "icon": "python"
+  },
+  {
+    "id": 5,
+    "title": "AI/ML CheatSheet",
+    "description": "Comprehensive AI/ML cheat sheet covering algorithms, mathematics, neural networks, NLP, model evaluation, and deployment practices.",
+    "category": "Artificial Intelligence & Machine Learning",
+    "pdfPath": "cheatsheets/AIML CheatSheet.pdf",
+    "color": "from-purple-500 to-pink-600",
+    "icon": "brain"
+  },
+  {
+    "id": 6,
+    "title": "20 Important Coding Patterns",
+    "description": "Essential DSA patterns including Sliding Window, Two Pointers, BFS, DFS, Top K Elements, and Knapsack for coding interviews.",
+    "category": "Data Structures & Algorithms",
+    "pdfPath": "/cheatsheets/20-imp-coding-patterns.pdf",
+     "color": "from-blue-600 to-blue-800",
+    "icon": "code"
+  }
+]

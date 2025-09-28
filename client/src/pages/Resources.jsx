@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FaGitAlt, FaBook, FaJava, FaBrain } from 'react-icons/fa';
+import { FaGitAlt, FaBook, FaJava, FaBrain, FaFileAlt, FaLink } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const Resources = () => {
@@ -19,6 +19,14 @@ const Resources = () => {
 
   const handleInterviewEssentialsClick = () => {
     navigate('/interview-essentials');
+  };
+
+  const handleCheatSheetsClick = () => {
+    navigate('/cheatsheets');
+  };
+
+  const handleLinkMaterialsClick = () => {
+    navigate('/linkmaterials');
   };
 
   return (
@@ -50,7 +58,7 @@ const Resources = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl w-full">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 max-w-7xl w-full">
             {/* Git Learning Resource */}
             <motion.button
               onClick={handleGitLearningClick}
@@ -237,6 +245,100 @@ const Resources = () => {
 
               {/* Hover effect overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+            </motion.button>
+
+            {/* External Study Materials Resource */}
+            <motion.button
+              onClick={handleCheatSheetsClick}
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 p-8"
+              whileHover={{ y: -10, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 1.3,
+                type: "spring",
+                stiffness: 100 
+              }}
+            >
+              <div className="text-center">
+                <motion.div 
+                  className="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-full mx-auto mb-6 flex items-center justify-center"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <FaFileAlt className="text-white text-2xl" />
+                </motion.div>
+                
+                <motion.h3 
+                  className="text-xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  External Study Materials
+                </motion.h3>
+                
+                <p className="text-gray-600 text-base leading-relaxed mb-4">
+                  Quick reference cheatsheets and PDFs for various programming languages and technologies. Perfect for last-minute reviews.
+                </p>
+                
+                <motion.div 
+                  className="inline-flex items-center text-green-600 font-semibold group-hover:text-teal-600 transition-colors duration-300"
+                  whileHover={{ x: 5 }}
+                >
+                  Browse Cheatsheets →
+                </motion.div>
+              </div>
+
+              {/* Hover effect overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-teal-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+            </motion.button>
+
+            {/* Link Materials Resource */}
+            <motion.button
+              onClick={handleLinkMaterialsClick}
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 p-8"
+              whileHover={{ y: -10, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 1.5,
+                type: "spring",
+                stiffness: 100 
+              }}
+            >
+              <div className="text-center">
+                <motion.div 
+                  className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-full mx-auto mb-6 flex items-center justify-center"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <FaLink className="text-white text-2xl" />
+                </motion.div>
+                
+                <motion.h3 
+                  className="text-xl font-bold text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Educational Links & Channels
+                </motion.h3>
+                
+                <p className="text-gray-600 text-base leading-relaxed mb-4">
+                  Curated collection of YouTube channels, websites, apps, and social media resources for comprehensive learning.
+                </p>
+                
+                <motion.div 
+                  className="inline-flex items-center text-indigo-600 font-semibold group-hover:text-purple-700 transition-colors duration-300"
+                  whileHover={{ x: 5 }}
+                >
+                  Explore Links →
+                </motion.div>
+              </div>
+
+              {/* Hover effect overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-700/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
             </motion.button>
           </div>
         </motion.div>

@@ -5,6 +5,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Team from './pages/Team';
 import Resources from './pages/Resources';
+import Cheatsheets from './pages/Cheatsheets';
+import LinkMaterials from './pages/LinkMaterials';
 import InterviewEssentials from './pages/InterviewEssentials';
 import InterviewEssentialsTest from './pages/InterviewEssentialsTest';
 import Login from './pages/Login';
@@ -30,6 +32,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/team" element={<Team />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/cheatsheets" element={<Cheatsheets />} />
+          <Route path="/linkmaterials" element={<LinkMaterials />} />
           <Route path="/interview-essentials" element={<InterviewEssentials />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
