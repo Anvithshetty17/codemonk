@@ -37,6 +37,6 @@
     "url": "https://youtube.com/@gatesmashers?si=ZwZ6Gf2MkRy_o9XT",
     "type": "youtube",
     "tags": ["Programming", "DSA", "Interview Prep", "Competitive Coding"],
-    "color": "from-red-500 to-red-700"
+     "color": "bg-gradient-to-r from-red-500 to-red-700"
   }
 ]
