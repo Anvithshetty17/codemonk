@@ -28,5 +28,15 @@
     "type": "website",
     "tags": ["DSA", "Programming", "Interview Prep", "Tutorials"],
     "color": "from-green-500 to-green-700"
+  },
+  {
+    "id": 4,
+    "title": "Gatesmashers YouTube Channel",
+    "description": "Channel focused on programming tutorials, competitive coding, and tech interview preparation in an easy-to-understand format.",
+    "category": "YouTube Channels",
+    "url": "https://youtube.com/@gatesmashers?si=ZwZ6Gf2MkRy_o9XT",
+    "type": "youtube",
+    "tags": ["Programming", "DSA", "Interview Prep", "Competitive Coding"],
+    "color": "from-red-500 to-red-700"
   }
 ]
