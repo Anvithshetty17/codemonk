@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "Apna College YouTube Channel",
+    "description": "Beginner-friendly programming tutorials, DSA, web development, and interview preparation explained in Hindi.",
+    "category": "YouTube Channels",
+    "url": "https://www.youtube.com/@ApnaCollegeOfficial",
+    "type": "youtube",
+    "tags": ["DSA", "Web Development", "Interview Prep", "Hindi"],
+    "color": "from-red-500 to-red-700"
+  },
+  {
+    "id": 2,
+    "title": "Java + DSA + Interview Preparation Playlist",
+    "description": "Comprehensive YouTube playlist covering Java fundamentals, Data Structures & Algorithms, and coding interview preparation.",
+    "category": "YouTube Playlists",
+    "url": "https://youtube.com/playlist?list=PLxnjbfm5MCHFbRlyVCAqpJFdIzPN_IPID&si=NW10a7bAmoPJJLAy",
+    "type": "youtube",
+    "tags": ["Java", "DSA", "Interview Prep"],
+    "color": "from-red-500 to-red-700"
+  },
+  {
+    "id": 3,
+    "title": "GeeksforGeeks",
+    "description": "Popular computer science portal with tutorials, coding practice problems, interview preparation resources, and courses.",
+    "category": "Websites",
+    "url": "https://www.geeksforgeeks.org/",
+    "type": "website",
+    "tags": ["DSA", "Programming", "Interview Prep", "Tutorials"],
+    "color": "from-green-500 to-green-700"
+  }
+]
