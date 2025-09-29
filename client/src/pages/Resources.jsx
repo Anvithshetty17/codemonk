@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FaGitAlt, FaBook, FaJava, FaBrain, FaFileAlt, FaLink } from 'react-icons/fa';
+import { FaGitAlt, FaBook, FaJava, FaBrain, FaFileAlt, FaLink, FaBuilding } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const Resources = () => {
@@ -27,6 +27,10 @@ const Resources = () => {
 
   const handleLinkMaterialsClick = () => {
     navigate('/linkmaterials');
+  };
+
+  const handleCampusDriveClick = () => {
+    navigate('/campus-drive');
   };
 
   return (
@@ -58,7 +62,7 @@ const Resources = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 max-w-7xl w-full">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-8xl w-full">
             {/* Git Learning Resource */}
             <motion.button
               onClick={handleGitLearningClick}
@@ -339,6 +343,53 @@ const Resources = () => {
 
               {/* Hover effect overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-700/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+            </motion.button>
+
+            {/* Campus Drive Resource */}
+            <motion.button
+              onClick={handleCampusDriveClick}
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 p-8"
+              whileHover={{ y: -10, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 1.7,
+                type: "spring",
+                stiffness: 100 
+              }}
+            >
+              <div className="text-center">
+                <motion.div 
+                  className="w-16 h-16 bg-gradient-to-r from-red-600 to-pink-600 rounded-full mx-auto mb-6 flex items-center justify-center"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <FaBuilding className="text-white text-2xl" />
+                </motion.div>
+                
+                <motion.h3 
+                  className="text-xl font-bold text-gray-900 mb-4 group-hover:text-red-600 transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Campus Drive Portal
+                </motion.h3>
+                
+                <p className="text-gray-600 text-base leading-relaxed mb-4">
+                  Complete information about upcoming campus drives, company details, job descriptions, and study materials.
+                </p>
+                
+                <motion.div 
+                  className="inline-flex items-center text-red-600 font-semibold group-hover:text-pink-600 transition-colors duration-300"
+                  whileHover={{ x: 5 }}
+                >
+                  View Drives →
+                </motion.div>
+              </div>
+
+              {/* Hover effect overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
             </motion.button>
           </div>
         </motion.div>

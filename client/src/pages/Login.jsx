@@ -12,7 +12,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,10 +20,15 @@ const Login = () => {
   const from = location.state?.from?.pathname || '/dashboard';
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
+    if (isAuthenticated && user) {
+      // Redirect admins to admin panel, others to dashboard or intended route
+      if (user.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, user, navigate, from]);
 
   const getUserFriendlyError = (error) => {
     if (error.response?.data?.message) {
@@ -70,8 +75,11 @@ const Login = () => {
     setFieldErrors({});
 
     try {
-      await login(formData);
-      showSuccess('Welcome back! Login successful.');
+      const result = await login(formData);
+      if (result.success) {
+        showSuccess('Welcome back! Login successful.');
+        // The useEffect will handle the navigation based on user role
+      }
     } catch (error) {
       const userMessage = getUserFriendlyError(error);
       

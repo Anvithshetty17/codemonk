@@ -1,23 +1,38 @@
 import { useState } from 'react';
-import StudentsTable from '../components/admin/StudentsTable';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+// import StudentsTable from '../components/admin/StudentsTable';
 import MembersManager from '../components/admin/MembersManager';
-import AnnouncementsManager from '../components/admin/AnnouncementsManager';
-import MaterialsManager from '../components/admin/MaterialsManager';
-import GroupManager from '../components/admin/GroupManager';
-import TaskManager from '../components/admin/TaskManager';
+// import AnnouncementsManager from '../components/admin/AnnouncementsManager';
+// import MaterialsManager from '../components/admin/MaterialsManager';
+// import GroupManager from '../components/admin/GroupManager';
+// import TaskManager from '../components/admin/TaskManager';
+import CampusDriveAdmin from '../components/admin/CampusDriveAdmin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faTrophy, faBullhorn, faBook, faProjectDiagram, faTasks } from '@fortawesome/free-solid-svg-icons';
+import { /* faUsers, */ faTrophy, /* faBullhorn, faBook, faProjectDiagram, faTasks, */ faBuilding, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 const AdminPanel = () => {
-  const [activeSection, setActiveSection] = useState('students');
+  const [activeSection, setActiveSection] = useState('members');
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   const sections = [
-    { id: 'students', label: 'Students', icon: faUsers, component: StudentsTable },
-    { id: 'groups', label: 'Groups', icon: faProjectDiagram, component: GroupManager },
-    { id: 'tasks', label: 'Task Management', icon: faTasks, component: TaskManager },
+    // { id: 'students', label: 'Students', icon: faUsers, component: StudentsTable },
+    // { id: 'groups', label: 'Groups', icon: faProjectDiagram, component: GroupManager },
+    // { id: 'tasks', label: 'Task Management', icon: faTasks, component: TaskManager },
     { id: 'members', label: 'Team Members', icon: faTrophy, component: MembersManager },
-    { id: 'announcements', label: 'Announcements', icon: faBullhorn, component: AnnouncementsManager },
-    { id: 'materials', label: 'Study Materials', icon: faBook, component: MaterialsManager }
+    // { id: 'announcements', label: 'Announcements', icon: faBullhorn, component: AnnouncementsManager },
+    // { id: 'materials', label: 'Study Materials', icon: faBook, component: MaterialsManager },
+    { id: 'campus-drives', label: 'Campus Drives', icon: faBuilding, component: CampusDriveAdmin }
   ];
 
   const ActiveComponent = sections.find(section => section.id === activeSection)?.component;
@@ -25,9 +40,29 @@ const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
-          <p className="text-gray-600">Manage Code Monk club content and members</p>
+        {/* Header with Logout Button */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
+            <p className="text-gray-600">Manage Code Monk club content and members</p>
+          </div>
+          
+          {/* User Info and Logout */}
+          <div className="flex items-center gap-4">
+            {user && (
+              <div className="text-gray-700">
+                <span className="text-sm opacity-75">Welcome, </span>
+                <span className="font-medium">{user.name}</span>
+              </div>
+            )}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 shadow-sm"
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 mb-8">

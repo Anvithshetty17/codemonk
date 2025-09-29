@@ -9,6 +9,7 @@ import Cheatsheets from './pages/Cheatsheets';
 import LinkMaterials from './pages/LinkMaterials';
 import InterviewEssentials from './pages/InterviewEssentials';
 import InterviewEssentialsTest from './pages/InterviewEssentialsTest';
+import CampusDrive from './pages/CampusDrive';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -35,6 +36,7 @@ function App() {
           <Route path="/cheatsheets" element={<Cheatsheets />} />
           <Route path="/linkmaterials" element={<LinkMaterials />} />
           <Route path="/interview-essentials" element={<InterviewEssentials />} />
+          <Route path="/campus-drive" element={<CampusDrive />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={
