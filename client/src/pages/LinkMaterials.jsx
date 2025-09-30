@@ -190,7 +190,7 @@ const LinkMaterials = () => {
                   {/* Header with Icon and Type */}
                   <div className="flex items-center justify-between mb-4">
                     <motion.div 
-                      className={`w-12 h-12 bg-gradient-to-r ${material.color} rounded-lg flex items-center justify-center`}
+                      className={`w-12 h-12 ${material.type === 'youtube' ? 'bg-red-500' : `bg-gradient-to-r ${material.color}`} rounded-lg flex items-center justify-center`}
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.8 }}
                     >

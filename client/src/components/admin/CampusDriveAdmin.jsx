@@ -270,7 +270,7 @@ const CampusDriveAdmin = () => {
                       <div className="flex items-center">
                         <FaBuilding className="text-red-500 mr-3" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-blue-600">
                             {drive.companyName}
                           </div>
                           <div className="text-sm text-gray-500 truncate max-w-xs">

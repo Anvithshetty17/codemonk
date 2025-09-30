@@ -185,7 +185,7 @@ const CampusDrive = () => {
                   <div className="bg-gradient-to-r from-red-600 to-pink-600 p-6 text-white">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-xl font-bold mb-2">{drive.companyName}</h3>
+                        <h3 className="text-xl font-bold mb-2 text-white drop-shadow-lg">{drive.companyName}</h3>
                         <div className="flex items-center gap-2 text-red-100">
                           <FaMapMarkerAlt className="text-sm" />
                           <span className="text-sm">{drive.category}</span>
