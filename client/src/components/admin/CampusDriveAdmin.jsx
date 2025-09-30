@@ -94,11 +94,38 @@ const CampusDriveAdmin = () => {
     e.preventDefault();
     
     try {
+      // Validate required fields
+      if (!formData.companyName || !formData.jobDescription || !formData.dateOfFirstRound || 
+          !formData.category || !formData.package) {
+        Swal.fire('Error', 'Please fill in all required fields', 'error');
+        return;
+      }
+
       // Prepare the data with proper date format
+      // Create date at noon to avoid timezone issues
+      const selectedDate = new Date(formData.dateOfFirstRound + 'T12:00:00');
+      
       const submitData = {
-        ...formData,
-        dateOfFirstRound: new Date(formData.dateOfFirstRound).toISOString()
+        companyName: formData.companyName.trim(),
+        jobDescription: formData.jobDescription.trim(),
+        dateOfFirstRound: selectedDate.toISOString(),
+        category: formData.category,
+        package: formData.package.trim(),
+        priority: parseInt(formData.priority) || 0
       };
+
+      // Add optional fields only if they have values
+      if (formData.studyMaterialLink && formData.studyMaterialLink.trim()) {
+        submitData.studyMaterialLink = formData.studyMaterialLink.trim();
+      }
+      
+      if (formData.companyWebsite && formData.companyWebsite.trim()) {
+        submitData.companyWebsite = formData.companyWebsite.trim();
+      }
+      
+      if (formData.additionalNotes && formData.additionalNotes.trim()) {
+        submitData.additionalNotes = formData.additionalNotes.trim();
+      }
 
       console.log('Submitting data:', submitData);
 
@@ -118,8 +145,17 @@ const CampusDriveAdmin = () => {
     } catch (error) {
       console.error('Error saving campus drive:', error);
       console.error('Error response:', error.response?.data);
-      const message = error.response?.data?.message || error.response?.data?.errors?.[0]?.message || 'Failed to save campus drive';
-      Swal.fire('Error', message, 'error');
+      
+      let errorMessage = 'Failed to save campus drive';
+      
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        const errorMessages = error.response.data.errors.map(err => err.msg || err.message).join(', ');
+        errorMessage = errorMessages;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      Swal.fire('Error', errorMessage, 'error');
     }
   };
 

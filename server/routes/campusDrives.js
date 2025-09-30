@@ -4,8 +4,8 @@ const { auth, adminAuth } = require('../middleware/auth');
 const CampusDrive = require('../models/CampusDrive');
 const { body, validationResult } = require('express-validator');
 
-// Validation rules
-const campusDriveValidation = [
+// Validation rules for creating new campus drives
+const campusDriveCreateValidation = [
   body('companyName')
     .trim()
     .notEmpty()
@@ -22,17 +22,7 @@ const campusDriveValidation = [
   
   body('dateOfFirstRound')
     .isISO8601()
-    .withMessage('Please provide a valid date')
-    .custom((value) => {
-      const date = new Date(value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      date.setHours(0, 0, 0, 0);
-      if (date < today) {
-        throw new Error('Date of first round cannot be in the past');
-      }
-      return true;
-    }),
+    .withMessage('Please provide a valid date'),
   
   body('category')
     .trim()
@@ -50,13 +40,105 @@ const campusDriveValidation = [
   
   body('studyMaterialLink')
     .optional()
-    .isURL()
-    .withMessage('Study material link must be a valid URL'),
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('Study material link must be a valid URL');
+        }
+      }
+      return true;
+    }),
   
   body('companyWebsite')
     .optional()
-    .isURL()
-    .withMessage('Company website must be a valid URL'),
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('Company website must be a valid URL');
+        }
+      }
+      return true;
+    }),
+  
+  body('additionalNotes')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage('Additional notes must not exceed 1000 characters'),
+  
+  body('priority')
+    .optional()
+    .isInt({ min: 0, max: 10 })
+    .withMessage('Priority must be between 0 and 10')
+];
+
+// Validation rules for updating campus drives (more lenient with dates)
+const campusDriveUpdateValidation = [
+  body('companyName')
+    .trim()
+    .notEmpty()
+    .withMessage('Company name is required')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Company name must be between 2 and 100 characters'),
+  
+  body('jobDescription')
+    .trim()
+    .notEmpty()
+    .withMessage('Job description is required')
+    .isLength({ min: 10, max: 2000 })
+    .withMessage('Job description must be between 10 and 2000 characters'),
+  
+  body('dateOfFirstRound')
+    .isISO8601()
+    .withMessage('Please provide a valid date'),
+  
+  body('category')
+    .trim()
+    .notEmpty()
+    .withMessage('Category is required')
+    .isIn(['Mass Recruitment', 'Dream Company', 'Super Dream Company'])
+    .withMessage('Invalid category'),
+  
+  body('package')
+    .trim()
+    .notEmpty()
+    .withMessage('Package information is required')
+    .isLength({ min: 3, max: 100 })
+    .withMessage('Package information must be between 3 and 100 characters'),
+  
+  body('studyMaterialLink')
+    .optional()
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('Study material link must be a valid URL');
+        }
+      }
+      return true;
+    }),
+  
+  body('companyWebsite')
+    .optional()
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('Company website must be a valid URL');
+        }
+      }
+      return true;
+    }),
   
   body('additionalNotes')
     .optional()
@@ -167,7 +249,7 @@ router.get('/:id', async (req, res) => {
 // @desc    Create new campus drive
 // @route   POST /api/campus-drives
 // @access  Private/Admin
-router.post('/', adminAuth, campusDriveValidation, async (req, res) => {
+router.post('/', adminAuth, campusDriveCreateValidation, async (req, res) => {
   try {
     // Check validation results
     const errors = validationResult(req);
@@ -219,7 +301,7 @@ router.post('/', adminAuth, campusDriveValidation, async (req, res) => {
 // @desc    Update campus drive
 // @route   PUT /api/campus-drives/:id
 // @access  Private/Admin
-router.put('/:id', adminAuth, campusDriveValidation, async (req, res) => {
+router.put('/:id', adminAuth, campusDriveUpdateValidation, async (req, res) => {
   try {
     // Check validation results
     const errors = validationResult(req);
