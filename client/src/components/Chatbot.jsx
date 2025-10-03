@@ -1015,7 +1015,7 @@ Just call him or drop a DM on Instagram **@kiran_killur** - he's super responsiv
 
     try {
       // Create enhanced prompt with CodeMonk context when relevant
-  let systemPrompt = "You are a helpful AI assistant that can answer any questions about programming, technology, and general topics. ALWAYS format responses using the following structured template unless the user explicitly asks for a different style:\n\n1. **Quick Summary** (2-4 concise sentences explaining the concept in plain language)\n2. **Real-World Examples** (bullet or numbered examples; include code blocks where useful. Prefer short, runnable code snippets. Each example should have: *Title*, *Explanation*, *Code* (if applicable), and *What to Notice*)\n3. **Conclusion / Key Takeaways** (3-5 bullet points reinforcing the most important ideas)\n\nAdditional Formatting Rules:\n- Leave a blank line between each major section\n- Use fenced code blocks with language identifiers (```js, ```python, etc.)\n- Keep tone instructional, clear, and encouraging\n- Avoid overly long paragraphs (wrap at reasonable length)\n- Bold important terms on first introduction.\n- If answer is extremely short (e.g., definition only), still include Summary and at least one Takeaway.\n- Never skip the structure; if info is scarce, use placeholders like 'No practical example required in this case' but still show headings.\n";
+      let systemPrompt = "You are a helpful AI assistant that can answer any questions about programming, technology, and general topics. Format your responses to be student-friendly with clear structure, headings, and code examples when relevant.";
       
       // Add CodeMonk context for club-related questions
       if (isClubRelated(userMessage)) {
@@ -1024,7 +1024,7 @@ Just call him or drop a DM on Instagram **@kiran_killur** - he's super responsiv
       
       // For programming questions, add helpful context
       if (isProgrammingRelated(userMessage)) {
-  systemPrompt += "\n\nWhen answering programming questions:\n- Use the required 3-section structure (Quick Summary, Real-World Examples, Conclusion / Key Takeaways)\n- Provide code examples in fenced code blocks with language tag\n- Use short variable names and minimal scaffolding\n- If demonstrating multiple languages, separate clearly with subheadings\n- Prefer showing both problem and output when relevant\n- Avoid redundant explanations already covered in Summary";
+        systemPrompt += "\n\nWhen answering programming questions:\n- Use clear headings (## for main sections)\n- Provide code examples in proper code blocks using ```language\n- Break down complex topics into bullet points\n- Include practical examples\n- Keep explanations concise but comprehensive\n- Use **bold** for important terms";
       }
 
       const fullPrompt = `${systemPrompt}\n\nUser question: ${userMessage}\n\nPlease provide a well-formatted, student-friendly answer with proper headings, code blocks, and clear structure:`;
@@ -1132,17 +1132,19 @@ Please check your Google Gemini API key in the .env file and try again. You can 
         const suggestedSeniors = suggestRelevantSeniors(currentInput);
         if (suggestedSeniors.length > 0) {
           let suggestionText = `💡 **Want personalized learning support?**\n\n`;
-          
+
           if (suggestedSeniors.length === 1) {
+            // Simple bold sentence for one senior (Markdown handles blank line separation)
             suggestionText += `**Contact ${suggestedSeniors[0].name} for expert guidance!**\n\n`;
           } else {
-            suggestionText += `**Contact any of these experts for guidance:**\n`;
+            // Use proper Markdown list so each senior appears on its own line
+            suggestionText += `**Contact any of these experts for guidance:**\n\n`;
             suggestedSeniors.forEach(senior => {
-              suggestionText += `• **${senior.name}**\n`;
+              suggestionText += `- **${senior.name}**\n`;
             });
             suggestionText += `\n`;
           }
-          
+
           suggestionText += `*Or reach out to any other CodeMonk team member for support through our team page!*`;
           
           const seniorSuggestion = {
@@ -1154,6 +1156,7 @@ Please check your Google Gemini API key in the .env file and try again. You can 
           setMessages(prev => [...prev, seniorSuggestion]);
         }
       }, 2800); // 2.8 second delay for natural conversation flow
+      
       
     } catch (error) {
       console.error('Error getting bot response:', error);
