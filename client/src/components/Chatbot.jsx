@@ -6,12 +6,14 @@ import {
   FaTimes, 
   FaComment,
   FaUser,
-  FaSpinner
+  FaSpinner,
+  FaTrash
 } from 'react-icons/fa';
 
 // Import club content for context-aware responses
 import cheatsheets from '../data/cheatsheets.json';
 import linkMaterials from '../data/linkmaterials.json';
+import GeminiResponse from './GeminiResponse';
 
 const Chatbot = () => {
   // Load messages from localStorage on component mount
@@ -1013,7 +1015,7 @@ Just call him or drop a DM on Instagram **@kiran_killur** - he's super responsiv
 
     try {
       // Create enhanced prompt with CodeMonk context when relevant
-      let systemPrompt = "You are a helpful AI assistant that can answer any questions about programming, technology, and general topics. Format your responses to be student-friendly with clear structure, headings, and code examples when relevant.";
+  let systemPrompt = "You are a helpful AI assistant that can answer any questions about programming, technology, and general topics. ALWAYS format responses using the following structured template unless the user explicitly asks for a different style:\n\n1. **Quick Summary** (2-4 concise sentences explaining the concept in plain language)\n2. **Real-World Examples** (bullet or numbered examples; include code blocks where useful. Prefer short, runnable code snippets. Each example should have: *Title*, *Explanation*, *Code* (if applicable), and *What to Notice*)\n3. **Conclusion / Key Takeaways** (3-5 bullet points reinforcing the most important ideas)\n\nAdditional Formatting Rules:\n- Leave a blank line between each major section\n- Use fenced code blocks with language identifiers (```js, ```python, etc.)\n- Keep tone instructional, clear, and encouraging\n- Avoid overly long paragraphs (wrap at reasonable length)\n- Bold important terms on first introduction.\n- If answer is extremely short (e.g., definition only), still include Summary and at least one Takeaway.\n- Never skip the structure; if info is scarce, use placeholders like 'No practical example required in this case' but still show headings.\n";
       
       // Add CodeMonk context for club-related questions
       if (isClubRelated(userMessage)) {
@@ -1022,7 +1024,7 @@ Just call him or drop a DM on Instagram **@kiran_killur** - he's super responsiv
       
       // For programming questions, add helpful context
       if (isProgrammingRelated(userMessage)) {
-        systemPrompt += "\n\nWhen answering programming questions:\n- Use clear headings (## for main sections)\n- Provide code examples in proper code blocks using ```language\n- Break down complex topics into bullet points\n- Include practical examples\n- Keep explanations concise but comprehensive\n- Use **bold** for important terms";
+  systemPrompt += "\n\nWhen answering programming questions:\n- Use the required 3-section structure (Quick Summary, Real-World Examples, Conclusion / Key Takeaways)\n- Provide code examples in fenced code blocks with language tag\n- Use short variable names and minimal scaffolding\n- If demonstrating multiple languages, separate clearly with subheadings\n- Prefer showing both problem and output when relevant\n- Avoid redundant explanations already covered in Summary";
       }
 
       const fullPrompt = `${systemPrompt}\n\nUser question: ${userMessage}\n\nPlease provide a well-formatted, student-friendly answer with proper headings, code blocks, and clear structure:`;
@@ -1178,116 +1180,13 @@ Please check your Google Gemini API key in the .env file and try again. You can 
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Component to format bot messages with proper styling
-  const FormattedMessage = ({ text, isUser = false }) => {
-    if (typeof text !== 'string') return <span>{text}</span>;
-
-    // For user messages, just return simple text
-    if (isUser) {
-      return <span className="text-white">{text}</span>;
-    }
-
-    // Split the text into parts (code blocks, headings, regular text)
-    const parts = text.split(/(```[\s\S]*?```|`[^`]+`|#{1,6}\s[^\n]+)/);
-    
-    return (
-      <div className="space-y-2">
-        {parts.map((part, index) => {
-          // Multi-line code blocks
-          if (part.startsWith('```') && part.endsWith('```')) {
-            const code = part.slice(3, -3).trim();
-            const lines = code.split('\n');
-            const language = lines[0].toLowerCase();
-            const codeContent = lines.slice(1).join('\n');
-            
-            return (
-              <div key={index} className="my-2">
-                <div className="bg-gray-900 text-gray-100 rounded-lg overflow-hidden">
-                  <div className="bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300">
-                    {language || 'Code'}
-                  </div>
-                  <pre className="p-2 overflow-x-auto text-xs max-w-full">
-                    <code className="whitespace-pre-wrap break-words">{codeContent || code}</code>
-                  </pre>
-                </div>
-              </div>
-            );
-          }
-          
-          // Inline code
-          if (part.startsWith('`') && part.endsWith('`')) {
-            const code = part.slice(1, -1);
-            return (
-              <code key={index} className="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-xs font-mono break-words">
-                {code}
-              </code>
-            );
-          }
-          
-          // Headings
-          if (part.match(/^#{1,6}\s/)) {
-            const level = part.match(/^#+/)[0].length;
-            const text = part.replace(/^#+\s/, '');
-            const HeadingTag = `h${Math.min(level + 2, 6)}`;
-            
-            return React.createElement(HeadingTag, {
-              key: index,
-              className: `font-bold text-gray-900 mt-3 mb-1 break-words ${
-                level === 1 ? 'text-base' : 
-                level === 2 ? 'text-sm' : 'text-sm'
-              }`
-            }, text);
-          }
-          
-          // Regular text with formatting
-          return (
-            <div key={index} className="space-y-1">
-              {part.split('\n').map((line, lineIndex) => {
-                if (!line.trim()) return <br key={lineIndex} />;
-                
-                // Bold text - properly format without showing **
-                line = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>');
-                
-                // Bullet points
-                if (line.trim().startsWith('*') || line.trim().startsWith('-')) {
-                  const content = line.trim().substring(1).trim();
-                  const formattedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
-                  return (
-                    <div key={lineIndex} className="flex items-start gap-2 ml-2">
-                      <span className="text-blue-500 mt-1 flex-shrink-0">•</span>
-                      <span className="break-words" dangerouslySetInnerHTML={{ __html: formattedContent }} />
-                    </div>
-                  );
-                }
-                
-                // Numbered lists
-                if (line.trim().match(/^\d+\./)) {
-                  const content = line.trim().replace(/^\d+\.\s*/, '');
-                  const formattedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
-                  return (
-                    <div key={lineIndex} className="flex items-start gap-2 ml-2">
-                      <span className="text-blue-500 font-medium flex-shrink-0">{line.trim().match(/^\d+/)[0]}.</span>
-                      <span className="break-words" dangerouslySetInnerHTML={{ __html: formattedContent }} />
-                    </div>
-                  );
-                }
-                
-                // Regular paragraphs
-                return (
-                  <p key={lineIndex} className="leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: line }} />
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+  // Removed custom FormattedMessage in favor of GeminiResponse markdown renderer
 
   return (
     <>
       {console.log('Chatbot render - isOpen:', isOpen)}
       {/* Chat Toggle Button */}
+      {!isOpen && (
       <motion.button
         onClick={toggleChat}
         className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-[9999] bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
@@ -1299,10 +1198,10 @@ Please check your Google Gemini API key in the .env file and try again. You can 
       >
         {isOpen ? <FaTimes size={24} /> : <FaComment size={24} />}
       </motion.button>
-
+      )}
       {/* Chat Window */}
       <div 
-        className={`fixed bottom-16 sm:bottom-24 right-2 sm:right-6 w-[calc(100vw-16px)] sm:w-[480px] md:w-[550px] lg:w-[600px] h-[calc(100vh-80px)] sm:h-[600px] bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden transition-all duration-300 ${
+        className={`fixed bottom-4 right-2 sm:right-6 w-[calc(100vw-16px)] sm:w-[480px] md:w-[550px] lg:w-[600px] h-[calc(100vh-80px)] sm:h-[600px] bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden transition-all duration-300 ${
           isOpen 
             ? 'opacity-100 scale-100 visible z-[9998]' 
             : 'opacity-0 scale-95 invisible z-[-1]'
@@ -1317,8 +1216,15 @@ Please check your Google Gemini API key in the .env file and try again. You can 
               <h3 className="font-semibold text-white">CodeMonk Assistant</h3>
               <p className="text-sm text-white opacity-90">Online • Ready to help</p>
             </div>
-            <button
+              <button
               onClick={clearChatHistory}
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-all duration-200"
+              title="Clear Chat History"
+            >
+              <FaTrash size={16} />
+            </button>
+            <button
+              onClick={toggleChat}
               className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-all duration-200"
               title="Clear Chat History"
             >
@@ -1347,7 +1253,11 @@ Please check your Google Gemini API key in the .env file and try again. You can 
                       : 'bg-white text-gray-800 rounded-bl-md border border-gray-200'
                   }`}>
                     <div className="text-sm leading-relaxed">
-                      <FormattedMessage text={message.text} isUser={message.sender === 'user'} />
+                      {message.sender === 'user' ? (
+                        <span className="text-white whitespace-pre-wrap break-words">{message.text}</span>
+                      ) : (
+                        <GeminiResponse markdownText={message.text} />
+                      )}
                     </div>
                     <p className={`text-xs mt-1 ${
                       message.sender === 'user' ? 'text-white opacity-80' : 'text-gray-500'
