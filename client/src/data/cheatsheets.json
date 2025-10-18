@@ -52,5 +52,14 @@
     "pdfPath": "/cheatsheets/20-imp-coding-patterns.pdf",
      "color": "from-blue-600 to-blue-800",
     "icon": "code"
+  },
+  {
+    "id": 7,
+    "title": "React Class PPT",
+    "description": "Essential React materials.",
+    "category": "PPT",
+    "pdfPath": "/cheatsheets/pptreact.pdf",
+    "color": "from-blue-600 to-blue-800",
+    "icon": "code"
   }
 ]
