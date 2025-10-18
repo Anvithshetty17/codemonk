@@ -61,5 +61,14 @@
     "pdfPath": "/cheatsheets/pptreact.pdf",
     "color": "from-blue-600 to-blue-800",
     "icon": "code"
+  },
+  {
+    "id": 8,
+    "title": "git & github Class PPT",
+    "description": "Essential git and github materials.",
+    "category": "PPT",
+    "pdfPath": "/cheatsheets/gitandgithub.pptx",
+    "color": "from-blue-600 to-blue-800",
+    "icon": "code"
   }
 ]
