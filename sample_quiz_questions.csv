@@ -1,0 +1,11 @@
+question,optionA,optionB,optionC,optionD,correctOption
+"What is the correct syntax to output 'Hello World' in JavaScript?","console.log('Hello World')","print('Hello World')","echo('Hello World')","System.out.println('Hello World')","A"
+"Which company developed JavaScript?","Microsoft","Netscape","Oracle","IBM","B"
+"What is the file extension for JavaScript files?",".js",".javascript",".jsx",".java","A"
+"How do you declare a variable in JavaScript?","var x","variable x","v x","dim x","A"
+"Which operator is used to assign a value to a variable?","=","==","===","->","A"
+"What will typeof null return?","null","object","undefined","number","B"
+"How do you create a function in JavaScript?","function myFunction()","def myFunction()","func myFunction()","create myFunction()","A"
+"Which method is used to parse a string to an integer?","parseInt()","parseInteger()","toInt()","int()","A"
+"What is the correct way to write an array in JavaScript?","var colors = ['red', 'green', 'blue']","var colors = 'red', 'green', 'blue'","var colors = (1:'red', 2:'green', 3:'blue')","var colors = red, green, blue","A"
+"How do you round the number 7.25 to the nearest integer?","Math.round(7.25)","round(7.25)","Math.rnd(7.25)","rnd(7.25)","A"

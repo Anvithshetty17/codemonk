@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import Navbar from './components/Navbar';
@@ -17,10 +17,25 @@ import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
 import Leaderboard from './pages/Leaderboard';
 import MentorDashboard from './pages/MentorDashboard';
+import TakeExam from './pages/TakeExam';
+import ExamScoreboard from './pages/ExamScoreboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Toast from './components/Toast';
 import './utils/fontawesome'; // Import Font Awesome configuration
+
+// Component to conditionally render chatbot based on route
+function ChatbotWrapper() {
+  const location = useLocation();
+  const allowedPaths = ['/', '/team', '/resources'];
+  
+  // Only show chatbot on home, team, and resources pages
+  if (allowedPaths.includes(location.pathname)) {
+    return <Chatbot />;
+  }
+  
+  return null;
+}
 
 function App() {
   return (
@@ -60,10 +75,16 @@ function App() {
                     <AdminPanel />
                   </AdminRoute>
                 } />
+                <Route path="/admin/scoreboard/:examId" element={
+                  <AdminRoute>
+                    <ExamScoreboard />
+                  </AdminRoute>
+                } />
+                <Route path="/take-exam" element={<TakeExam />} />
               </Routes>
             </main>
             <Toast />
-            <Chatbot />
+            <ChatbotWrapper />
           </div>
         </Router>
       </ToastProvider>

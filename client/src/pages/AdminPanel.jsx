@@ -8,8 +8,9 @@ import MembersManager from '../components/admin/MembersManager';
 // import GroupManager from '../components/admin/GroupManager';
 // import TaskManager from '../components/admin/TaskManager';
 import CampusDriveAdmin from '../components/admin/CampusDriveAdmin';
+import ExamManager from '../components/admin/ExamManager';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { /* faUsers, */ faTrophy, /* faBullhorn, faBook, faProjectDiagram, faTasks, */ faBuilding, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { /* faUsers, */ faTrophy, /* faBullhorn, faBook, faProjectDiagram, faTasks, */ faBuilding, faClipboardCheck, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState('members');
@@ -32,7 +33,8 @@ const AdminPanel = () => {
     { id: 'members', label: 'Team Members', icon: faTrophy, component: MembersManager },
     // { id: 'announcements', label: 'Announcements', icon: faBullhorn, component: AnnouncementsManager },
     // { id: 'materials', label: 'Study Materials', icon: faBook, component: MaterialsManager },
-    { id: 'campus-drives', label: 'Campus Drives', icon: faBuilding, component: CampusDriveAdmin }
+    { id: 'campus-drives', label: 'Campus Drives', icon: faBuilding, component: CampusDriveAdmin },
+    { id: 'exams', label: 'Exam Management', icon: faClipboardCheck, component: ExamManager }
   ];
 
   const ActiveComponent = sections.find(section => section.id === activeSection)?.component;

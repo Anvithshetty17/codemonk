@@ -19,6 +19,7 @@ const groupRoutes = require('./routes/groups');
 const taskRoutes = require('./routes/tasks');
 const otpRoutes = require('./routes/otp');
 const campusDriveRoutes = require('./routes/campusDrives');
+const examRoutes = require('./routes/exams');
 
 // Connect to database
 connectDB();
@@ -108,6 +109,7 @@ app.use('/api/announcements', announcementRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/campus-drives', campusDriveRoutes);
+app.use('/api/exams', examRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
