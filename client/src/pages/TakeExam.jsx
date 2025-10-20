@@ -17,6 +17,57 @@ const TakeExam = () => {
   const [exam, setExam] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [checkingStorage, setCheckingStorage] = useState(true);
+
+  // Check for saved video exam progress on mount
+  React.useEffect(() => {
+    const checkSavedProgress = async () => {
+      try {
+        // Find any video exam in localStorage
+        const keys = Object.keys(localStorage);
+        const videoExamKey = keys.find(key => key.startsWith('videoExam_'));
+        
+        if (videoExamKey) {
+          const savedData = JSON.parse(localStorage.getItem(videoExamKey));
+          
+          // Check if it's still valid (within 24 hours)
+          const savedTime = new Date(savedData.timestamp);
+          const now = new Date();
+          const hoursDiff = (now - savedTime) / (1000 * 60 * 60);
+          
+          if (hoursDiff < 24) {
+            // Extract examId from key: videoExam_${examId}_${usn}
+            const examId = savedData.examId;
+            
+            // Fetch exam details
+            const response = await axios.get(`${API_URL}/exams/${examId}`);
+            const examData = response.data.data;
+            
+            // Only auto-resume for video exams
+            if (examData.examType === 'video') {
+              setStudentInfo({
+                usn: savedData.usn,
+                studentName: savedData.studentName,
+                examCode: '' // Not needed for resume
+              });
+              setExam(examData);
+              setStep('taking');
+              addToast('📌 Resuming your video exam...', 'info');
+            }
+          } else {
+            // Remove expired data
+            localStorage.removeItem(videoExamKey);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking saved progress:', error);
+      } finally {
+        setCheckingStorage(false);
+      }
+    };
+
+    checkSavedProgress();
+  }, []);
 
   const handleStartExam = async (e) => {
     e.preventDefault();
@@ -48,6 +99,21 @@ const TakeExam = () => {
     setExam(null);
     setResult(null);
   };
+
+  // Show loading while checking localStorage
+  if (checkingStorage) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600 font-medium">Checking for saved progress...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (step === 'taking' && exam) {
     if (exam.examType === 'quiz') {

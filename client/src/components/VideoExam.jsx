@@ -6,12 +6,37 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   const { addToast } = useToast();
-  const [watchTime, setWatchTime] = useState(0);
-  const [videoDuration, setVideoDuration] = useState(0);
+  const localStorageKey = `videoExam_${exam._id}_${studentInfo.usn}`;
+  
+  // Load saved progress from localStorage
+  const loadSavedProgress = () => {
+    try {
+      const saved = localStorage.getItem(localStorageKey);
+      if (saved) {
+        const data = JSON.parse(saved);
+        // Only load if it's the same exam and within last 24 hours
+        const savedTime = new Date(data.timestamp);
+        const now = new Date();
+        const hoursDiff = (now - savedTime) / (1000 * 60 * 60);
+        
+        if (hoursDiff < 24) {
+          return data;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved progress:', error);
+    }
+    return null;
+  };
+
+  const savedProgress = loadSavedProgress();
+  
+  const [watchTime, setWatchTime] = useState(savedProgress?.watchTime || 0);
+  const [videoDuration, setVideoDuration] = useState(savedProgress?.videoDuration || 0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [startTime] = useState(new Date());
+  const [startTime] = useState(savedProgress?.startTime ? new Date(savedProgress.startTime) : new Date());
   const [loading, setLoading] = useState(false);
-  const [canSubmit, setCanSubmit] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(savedProgress?.canSubmit || false);
   const [wasPlayingBeforeHidden, setWasPlayingBeforeHidden] = useState(false);
   const [videoPaused, setVideoPaused] = useState(false);
   const [pauseReason, setPauseReason] = useState('');
@@ -27,6 +52,54 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   };
 
   const videoId = getYouTubeVideoId(exam.videoLink);
+
+  // Handle cancel with localStorage cleanup
+  const handleCancel = () => {
+    try {
+      localStorage.removeItem(localStorageKey);
+      console.log('✅ Exam progress cleared from localStorage (Cancel)');
+    } catch (error) {
+      console.error('Error clearing localStorage:', error);
+    }
+    onCancel();
+  };
+
+  // Save progress to localStorage whenever key data changes
+  useEffect(() => {
+    const saveProgress = () => {
+      try {
+        const progressData = {
+          examId: exam._id,
+          usn: studentInfo.usn,
+          studentName: studentInfo.studentName,
+          watchTime,
+          videoDuration,
+          canSubmit,
+          startTime: startTime.toISOString(),
+          timestamp: new Date().toISOString()
+        };
+        localStorage.setItem(localStorageKey, JSON.stringify(progressData));
+      } catch (error) {
+        console.error('Error saving progress:', error);
+      }
+    };
+
+    // Save every 5 seconds if video is loaded
+    if (videoDuration > 0) {
+      const saveInterval = setInterval(saveProgress, 5000);
+      return () => clearInterval(saveInterval);
+    }
+  }, [watchTime, videoDuration, canSubmit, exam._id, studentInfo.usn, studentInfo.studentName, startTime, localStorageKey]);
+
+  // Show message if resuming from saved progress
+  useEffect(() => {
+    if (savedProgress) {
+      const completionPercentage = savedProgress.videoDuration > 0 
+        ? Math.min(((savedProgress.watchTime / savedProgress.videoDuration) * 100), 100).toFixed(1)
+        : 0;
+      addToast(`📌 Resuming exam - ${completionPercentage}% completed`, 'info');
+    }
+  }, []);
 
   useEffect(() => {
     if (!videoId) {
@@ -99,18 +172,23 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
             if (state === window.YT.PlayerState.PLAYING) {
               setWasPlayingBeforeHidden(true);
               setVideoPaused(true);
-              setPauseReason('Tab change detected');
+              setPauseReason('Tab/App switched');
               playerRef.current.pauseVideo();
-              addToast('⚠️ Video paused - Tab changed. Return to this tab to resume watching.', 'warning');
+              addToast('⚠️ Video paused - Tab changed. Return to resume.', 'warning');
             }
           } catch (error) {
             console.error('Error pausing video:', error);
           }
         }
       } else {
-        // Tab is visible again
-        if (videoPaused) {
-          setVideoPaused(false);
+        // Tab is visible again - clear paused overlay but don't auto-play
+        if (videoPaused && wasPlayingBeforeHidden) {
+          // Clear the paused state so user can click resume
+          setTimeout(() => {
+            setVideoPaused(false);
+            setWasPlayingBeforeHidden(false);
+            // Don't auto-play, let user click resume button
+          }, 500);
         }
       }
     };
@@ -123,9 +201,9 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
           if (state === window.YT.PlayerState.PLAYING) {
             setWasPlayingBeforeHidden(true);
             setVideoPaused(true);
-            setPauseReason('Window minimized/focus lost');
+            setPauseReason('App/Window switched');
             playerRef.current.pauseVideo();
-            addToast('⚠️ Video paused - Tab/Window changed!', 'warning');
+            addToast('⚠️ Video paused - Please return to continue.', 'warning');
           }
         } catch (error) {
           console.error('Error pausing video:', error);
@@ -134,9 +212,11 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
     };
 
     const handleFocus = () => {
-      // Window gained focus
+      // Window gained focus - clear paused overlay after delay
       if (videoPaused && !document.hidden) {
-        setVideoPaused(false);
+        setTimeout(() => {
+          setVideoPaused(false);
+        }, 500);
       }
     };
 
@@ -294,6 +374,15 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
       });
 
       const completionPercentage = response.data.data.completionPercentage;
+      
+      // Clear localStorage after successful submission
+      try {
+        localStorage.removeItem(localStorageKey);
+        console.log('✅ Exam progress cleared from localStorage');
+      } catch (error) {
+        console.error('Error clearing localStorage:', error);
+      }
+      
       addToast(`✅ Video exam submitted! Completion: ${completionPercentage}%`, 'success');
       
       onComplete(response.data.data);
@@ -380,7 +469,7 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
               <p className="text-gray-600">{studentInfo.studentName} ({studentInfo.usn})</p>
             </div>
             <button
-              onClick={onCancel}
+              onClick={handleCancel}
               className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition"
             >
               Cancel
@@ -398,27 +487,40 @@ const VideoExam = ({ exam, studentInfo, onComplete, onCancel }) => {
             
             {/* Resume Overlay */}
             {videoPaused && (
-              <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10">
-                <div className="text-center text-white p-8">
+              <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center z-10">
+                <div className="text-center text-white p-8 max-w-md">
                   <svg className="w-20 h-20 mx-auto mb-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   <p className="text-2xl font-bold mb-2">Video Paused</p>
-                  <p className="text-lg mb-4">{pauseReason}</p>
+                  <p className="text-base sm:text-lg mb-6 text-gray-300">{pauseReason}</p>
                   <button
                     onClick={() => {
-                      if (playerRef.current && playerRef.current.playVideo) {
-                        playerRef.current.playVideo();
-                        setVideoPaused(false);
+                      if (playerRef.current) {
+                        try {
+                          // Clear all pause states
+                          setVideoPaused(false);
+                          setWasPlayingBeforeHidden(false);
+                          
+                          // Ensure player is ready and play
+                          if (playerRef.current.playVideo) {
+                            playerRef.current.playVideo();
+                          }
+                        } catch (error) {
+                          console.error('Error resuming video:', error);
+                          // Fallback: just clear the overlay
+                          setVideoPaused(false);
+                        }
                       }
                     }}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-lg transition flex items-center gap-2 mx-auto"
+                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-lg transition-all duration-200 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl active:scale-95"
                   >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                     </svg>
-                    Resume Video
+                    Click to Resume
                   </button>
+                  <p className="text-xs text-gray-400 mt-4">Tap the button above to continue watching</p>
                 </div>
               </div>
             )}

@@ -12,6 +12,166 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   const [startTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
 
+  // Disable right-click, text selection, and copy during exam
+  useEffect(() => {
+    // Disable right-click
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      addToast('Right-click is disabled during exam', 'warning');
+      return false;
+    };
+
+    // Disable copy
+    const handleCopy = (e) => {
+      e.preventDefault();
+      addToast('Copying is disabled during exam', 'warning');
+      return false;
+    };
+
+    // Disable cut
+    const handleCut = (e) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Disable keyboard shortcuts for copy and screenshots
+    const handleKeyDown = (e) => {
+      // Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+P (print)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'x' || e.key === 'a' || e.key === 'p')) {
+        e.preventDefault();
+        addToast('This action is disabled during exam', 'warning');
+        return false;
+      }
+      // F12, Ctrl+Shift+I, Ctrl+Shift+J (dev tools)
+      if (e.keyCode === 123 || 
+          ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74))) {
+        e.preventDefault();
+        return false;
+      }
+      
+      // COMPREHENSIVE SCREENSHOT BLOCKING
+      // PrtScn / Print Screen (keyCode: 44)
+      if (e.keyCode === 44 || e.key === 'PrintScreen') {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // F10 key (keyCode: 121) - Some laptops use Fn+F10 for screenshot
+      if (e.keyCode === 121 || e.key === 'F10') {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // F11 key (keyCode: 122) - Some laptops use Fn+F11 for screenshot
+      if (e.keyCode === 122 || e.key === 'F11') {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // Alt + PrtScn (Active window screenshot)
+      if (e.altKey && (e.keyCode === 44 || e.key === 'PrintScreen')) {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // Ctrl + PrtScn (Some laptops)
+      if (e.ctrlKey && (e.keyCode === 44 || e.key === 'PrintScreen')) {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // Windows + PrtScn (Full screen to Pictures folder)
+      if ((e.metaKey || e.key === 'Meta') && (e.keyCode === 44 || e.key === 'PrintScreen')) {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // Windows + Shift + S (Snipping Tool / Snip & Sketch)
+      if ((e.metaKey || e.key === 'Meta') && e.shiftKey && e.key === 's') {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+      
+      // Windows + G (Game Bar - can record screen)
+      if ((e.metaKey || e.key === 'Meta') && e.key === 'g') {
+        e.preventDefault();
+        addToast('⚠️ Screen recording is not allowed during exam', 'error');
+        return false;
+      }
+      
+      // Windows + Alt + PrtScn (Game Bar screenshot)
+      if ((e.metaKey || e.key === 'Meta') && e.altKey && (e.keyCode === 44 || e.key === 'PrintScreen')) {
+        e.preventDefault();
+        addToast('⚠️ Screenshots are not allowed during exam', 'error');
+        return false;
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('copy', handleCopy);
+    document.addEventListener('cut', handleCut);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('copy', handleCopy);
+      document.removeEventListener('cut', handleCut);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [addToast]);
+
+  // Detect screenshot attempts on mobile (Android/iOS)
+  useEffect(() => {
+    let screenshotDetected = false;
+
+    // Detect visibility change (common during screenshot on mobile)
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        screenshotDetected = true;
+        setTimeout(() => {
+          if (!document.hidden && screenshotDetected) {
+            addToast('⚠️ Screenshot detection: This activity may be reported', 'error');
+            screenshotDetected = false;
+          }
+        }, 100);
+      }
+    };
+
+    // Detect user leaving the page (screenshot overlay triggers this on some devices)
+    const handleBlur = () => {
+      setTimeout(() => {
+        if (document.hasFocus()) {
+          addToast('⚠️ Suspicious activity detected', 'warning');
+        }
+      }, 200);
+    };
+
+    // Add event listeners
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+
+    // Prevent screenshot on Android via secure flag (using meta tag)
+    const metaTag = document.createElement('meta');
+    metaTag.name = 'screenshot';
+    metaTag.content = 'disabled';
+    document.head.appendChild(metaTag);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      if (metaTag.parentNode) {
+        metaTag.parentNode.removeChild(metaTag);
+      }
+    };
+  }, [addToast]);
+
   // Simple timer - auto submit when time is up
   useEffect(() => {
     if (timeRemaining <= 0) {
@@ -102,7 +262,26 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   const unansweredCount = exam.questions.length - answeredCount;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-gray-100 p-3 sm:p-4 md:p-6 select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
+      <style>{`
+        * {
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          user-select: none !important;
+        }
+        *::selection {
+          background: transparent !important;
+        }
+        *::-moz-selection {
+          background: transparent !important;
+        }
+        /* Prevent screenshot capture on supported browsers */
+        body {
+          -webkit-touch-callout: none !important;
+          -webkit-user-select: none !important;
+        }
+      `}</style>
       <div className="max-w-6xl mx-auto">
         {/* Professional Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 mb-4 sm:mb-5">
