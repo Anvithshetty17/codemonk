@@ -42,7 +42,7 @@ const ExamManager = () => {
       const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
       
       if (!token) {
-        addToast({ type: 'error', message: 'You must be logged in as admin. Please login first.' });
+        addToast('You must be logged in as admin. Please login first.', 'error');
         console.error('No token found. Please log in.');
         return;
       }
@@ -55,11 +55,11 @@ const ExamManager = () => {
       console.error('Error fetching exams:', error);
       
       if (error.response?.status === 403) {
-        addToast({ type: 'error', message: 'Access denied. Please log in as an admin user.' });
+        addToast('Access denied. Please log in as an admin user.', 'error');
       } else if (error.response?.status === 401) {
-        addToast({ type: 'error', message: 'Session expired. Please log in again.' });
+        addToast('Session expired. Please log in again.', 'error');
       } else {
-        addToast({ type: 'error', message: 'Failed to fetch exams' });
+        addToast('Failed to fetch exams', 'error');
       }
     }
   };
@@ -76,7 +76,7 @@ const ExamManager = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      addToast(response.data.message);
+      addToast(response.data.message, 'success');
       
       if (examForm.examType === 'quiz') {
         // Navigate to question management
@@ -97,7 +97,7 @@ const ExamManager = () => {
         videoLink: ''
       });
     } catch (error) {
-      addToast({ type: 'error', message: error.response?.data?.message || 'Failed to create exam' });
+      addToast(error.response?.data?.message || 'Failed to create exam', 'error');
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,7 @@ const ExamManager = () => {
   const handleAddQuestion = () => {
     if (!questionForm.question || !questionForm.optionA || !questionForm.optionB || 
         !questionForm.optionC || !questionForm.optionD) {
-      addToast({ type: 'error', message: 'Please fill all fields' });
+      addToast('Please fill all fields', 'error');
       return;
     }
 
@@ -119,17 +119,17 @@ const ExamManager = () => {
       optionD: '',
       correctOption: 'A'
     });
-    addToast('Question added');
+    addToast('Question added successfully', 'success');
   };
 
   const handleRemoveQuestion = (index) => {
     setQuestions(questions.filter((_, i) => i !== index));
-    addToast({ type: 'info', message: 'Question removed' });
+    addToast('Question removed', 'info');
   };
 
   const handleSaveQuestions = async () => {
     if (questions.length === 0) {
-      addToast({ type: 'error', message: 'Please add at least one question' });
+      addToast('Please add at least one question', 'error');
       return;
     }
 
@@ -142,13 +142,13 @@ const ExamManager = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      addToast('Quiz created successfully!');
+      addToast('Quiz created successfully!', 'success');
       setShowQuestionModal(false);
       setSelectedExam(null);
       setQuestions([]);
       fetchExams();
     } catch (error) {
-      addToast({ type: 'error', message: error.response?.data?.message || 'Failed to save questions' });
+      addToast(error.response?.data?.message || 'Failed to save questions', 'error');
     } finally {
       setLoading(false);
     }
@@ -164,26 +164,49 @@ const ExamManager = () => {
         const text = event.target.result;
         const rows = text.split('\n').filter(row => row.trim());
         
-        // Skip header row
+        // Function to parse CSV row handling quoted fields with commas
+        const parseCSVRow = (row) => {
+          const result = [];
+          let current = '';
+          let inQuotes = false;
+          
+          for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              result.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          result.push(current.trim());
+          return result;
+        };
+        
+        // Skip header row and parse questions
         const parsedQuestions = rows.slice(1).map(row => {
-          const [question, optionA, optionB, optionC, optionD, correctOption] = 
-            row.split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
+          const [question, optionA, optionB, optionC, optionD, correctOption] = parseCSVRow(row);
           
           return {
-            question,
-            optionA,
-            optionB,
-            optionC,
-            optionD,
-            correctOption: correctOption.toUpperCase()
+            question: question || '',
+            optionA: optionA || '',
+            optionB: optionB || '',
+            optionC: optionC || '',
+            optionD: optionD || '',
+            correctOption: (correctOption || '').toUpperCase()
           };
-        });
+        }).filter(q => q.question && q.correctOption); // Filter out empty rows
 
         setQuestions([...questions, ...parsedQuestions]);
-        addToast(`${parsedQuestions.length} questions imported from CSV`);
+        addToast(`${parsedQuestions.length} questions imported from CSV`, 'success');
         setCsvFile(null);
+        e.target.value = ''; // Reset file input
       } catch (error) {
-        addToast({ type: 'error', message: 'Error parsing CSV file. Please check the format.' });
+        console.error('CSV parsing error:', error);
+        addToast('Error parsing CSV file. Please check the format.', 'error');
       }
     };
     reader.readAsText(file);
@@ -197,10 +220,10 @@ const ExamManager = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      addToast(`Exam ${currentStatus ? 'deactivated' : 'activated'}`);
+      addToast(`Exam ${currentStatus ? 'deactivated' : 'activated'}`, 'success');
       fetchExams();
     } catch (error) {
-      addToast({ type: 'error', message: 'Failed to update exam status' });
+      addToast('Failed to update exam status', 'error');
     }
   };
 
@@ -212,10 +235,10 @@ const ExamManager = () => {
       const response = await axios.delete(`${API_URL}/exams/${examId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      addToast(response.data.message);
+      addToast(response.data.message, 'success');
       fetchExams();
     } catch (error) {
-      addToast({ type: 'error', message: 'Failed to delete exam' });
+      addToast('Failed to delete exam', 'error');
     }
   };
 
@@ -237,10 +260,10 @@ const ExamManager = () => {
       const response = await axios.delete(`${API_URL}/exams/clear/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      addToast(response.data.message);
+      addToast(response.data.message, 'success');
       fetchExams();
     } catch (error) {
-      addToast({ type: 'error', message: error.response?.data?.message || 'Failed to clear exams' });
+      addToast(error.response?.data?.message || 'Failed to clear exams', 'error');
     }
   };
 
