@@ -132,6 +132,35 @@ exports.getExamByCode = asyncHandler(async (req, res) => {
   });
 });
 
+// Check if student has already submitted an exam
+exports.checkSubmission = asyncHandler(async (req, res) => {
+  const { examId, usn } = req.params;
+
+  const exam = await Exam.findById(examId);
+  
+  if (!exam) {
+    return res.status(404).json({
+      success: false,
+      message: 'Exam not found'
+    });
+  }
+
+  const existingSubmission = await ExamSubmission.findOne({ 
+    exam: examId, 
+    usn: usn.toUpperCase() 
+  });
+
+  res.status(200).json({
+    success: true,
+    hasSubmitted: !!existingSubmission,
+    submission: existingSubmission ? {
+      submittedAt: existingSubmission.submittedAt,
+      score: existingSubmission.score,
+      totalQuestions: existingSubmission.totalQuestions
+    } : null
+  });
+});
+
 // Submit quiz answers
 exports.submitQuiz = asyncHandler(async (req, res) => {
   const { examId, studentName, usn, answers, startedAt, submittedAt, autoSubmitted, autoSubmitReason } = req.body;

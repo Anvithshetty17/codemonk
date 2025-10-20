@@ -6,11 +6,48 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   const { addToast } = useToast();
+  
+  // Randomize questions once on component mount
+  const [randomizedQuestions] = useState(() => {
+    const shuffled = [...exam.questions];
+    // Fisher-Yates shuffle algorithm
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  });
+  
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [timeRemaining, setTimeRemaining] = useState(exam.duration * 60);
   const [startTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+  const [checkingSubmission, setCheckingSubmission] = useState(true);
+
+  // Check if student has already submitted this exam
+  useEffect(() => {
+    const checkPreviousSubmission = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/exams/${exam._id}/check-submission/${studentInfo.usn}`
+        );
+        
+        if (response.data.hasSubmitted) {
+          setAlreadySubmitted(true);
+          addToast('❌ You have already submitted this exam', 'error');
+        }
+      } catch (error) {
+        console.error('Error checking submission:', error);
+        // If endpoint doesn't exist or error, allow exam to continue
+      } finally {
+        setCheckingSubmission(false);
+      }
+    };
+
+    checkPreviousSubmission();
+  }, [exam._id, studentInfo.usn, addToast]);
 
   // Disable right-click, text selection, and copy during exam
   useEffect(() => {
@@ -200,7 +237,7 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   };
 
   const handleNext = () => {
-    if (currentQuestion < exam.questions.length - 1) {
+    if (currentQuestion < randomizedQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     }
   };
@@ -214,7 +251,7 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
   const handleSubmit = async () => {
     if (loading) return;
 
-    const unanswered = exam.questions.length - Object.keys(answers).length;
+    const unanswered = randomizedQuestions.length - Object.keys(answers).length;
     if (unanswered > 0 && timeRemaining > 0) {
       if (!window.confirm(`You have ${unanswered} unanswered questions. Submit anyway?`)) {
         return;
@@ -224,9 +261,22 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
     setLoading(true);
 
     try {
-      // Format answers - backend will calculate isCorrect
+      // Map randomized answers back to original question order
+      // Create a map of original question indices
+      const originalAnswers = {};
+      randomizedQuestions.forEach((randomizedQuestion, randomizedIndex) => {
+        // Find the original index of this question
+        const originalIndex = exam.questions.findIndex(q => 
+          q.question === randomizedQuestion.question && 
+          q.correctAnswer === randomizedQuestion.correctAnswer
+        );
+        // Map the answer from randomized index to original index
+        originalAnswers[originalIndex] = answers[randomizedIndex] || null;
+      });
+
+      // Format answers in original question order for backend
       const formattedAnswers = exam.questions.map((_, index) => ({
-        selectedOption: answers[index] || null
+        selectedOption: originalAnswers[index] || null
       }));
 
       const submissionData = {
@@ -256,10 +306,89 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
     }
   };
 
-  const question = exam.questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / exam.questions.length) * 100;
+  const question = randomizedQuestions[currentQuestion];
+  const progress = ((currentQuestion + 1) / randomizedQuestions.length) * 100;
   const answeredCount = Object.keys(answers).length;
-  const unansweredCount = exam.questions.length - answeredCount;
+  const unansweredCount = randomizedQuestions.length - answeredCount;
+
+  // Show loading while checking if already submitted
+  if (checkingSubmission) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600 font-medium">Verifying exam eligibility...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show "Already Submitted" message if student has already taken the exam
+  if (alreadySubmitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full">
+          <div className="text-center">
+            {/* Error Icon */}
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              <div className="absolute inset-0 bg-red-100 rounded-full animate-pulse"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+            </div>
+
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-3">
+              Already Submitted
+            </h2>
+            <p className="text-gray-600 mb-4">
+              You have already submitted this exam
+            </p>
+
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg text-left">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">
+                    <strong>Exam Details:</strong>
+                  </p>
+                  <p className="text-sm text-red-700 mt-1">
+                    • Exam: {exam.examName}<br />
+                    • Student: {studentInfo.studentName}<br />
+                    • USN: {studentInfo.usn}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> Each student is allowed to attempt the exam only once. If you believe this is an error, please contact your administrator.
+              </p>
+            </div>
+
+            <button
+              onClick={onCancel}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-3 sm:p-4 md:p-6 select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
@@ -314,7 +443,7 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
               {/* Answered Stats */}
               <div className="bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
                 <div className="text-xs text-gray-500 font-medium">Answered</div>
-                <div className="text-xl font-bold text-gray-900">{answeredCount} / {exam.questions.length}</div>
+                <div className="text-xl font-bold text-gray-900">{answeredCount} / {randomizedQuestions.length}</div>
               </div>
 
               {/* Timer */}
@@ -345,7 +474,7 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
             {/* Progress Bar */}
             <div>
               <div className="flex justify-between text-xs text-gray-600 mb-1.5">
-                <span className="font-medium">Question {currentQuestion + 1} of {exam.questions.length}</span>
+                <span className="font-medium">Question {currentQuestion + 1} of {randomizedQuestions.length}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
                 <div
@@ -410,7 +539,7 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
               ← Previous
             </button>
 
-            {currentQuestion < exam.questions.length - 1 ? (
+            {currentQuestion < randomizedQuestions.length - 1 ? (
               <button
                 onClick={handleNext}
                 className="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors ml-auto"
@@ -436,7 +565,7 @@ const QuizExam = ({ exam, studentInfo, onComplete, onCancel }) => {
           </h3>
           
           <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-15 gap-2 mb-5">
-            {exam.questions.map((_, index) => (
+            {randomizedQuestions.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentQuestion(index)}

@@ -5,6 +5,7 @@ const {
   addQuestions,
   updateQuestions,
   getExamByCode,
+  checkSubmission,
   submitQuiz,
   submitVideoWatch,
   getAllExams,
@@ -18,6 +19,7 @@ const { adminAuth } = require('../middleware/auth');
 
 // Public routes (for students)
 router.get('/code/:examCode', getExamByCode);
+router.get('/:examId/check-submission/:usn', checkSubmission);
 router.post('/submit-quiz', submitQuiz);
 router.post('/submit-video', submitVideoWatch);
 
